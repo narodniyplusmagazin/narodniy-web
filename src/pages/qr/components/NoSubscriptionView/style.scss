@@ -1,0 +1,77 @@
+.no-subscription-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 16px;
+}
+
+.qr-placeholder-card {
+    background-color: var(--white-color);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.placeholder-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 12px;
+}
+
+.placeholder-text {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.features-card {
+    background-color: var(--white-color);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.features-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.feature-icon {
+    font-size: 20px;
+    color: var(--primary-color);
+    margin-right: 12px;
+    font-weight: bold;
+}
+
+.feature-text {
+    font-size: 15px;
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+.subscribe-button {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-size: 18px;
+    font-weight: 700;
+    padding: 18px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.1s;
+}
+
+.subscribe-button:hover {
+    transform: translateY(-2px);
+}

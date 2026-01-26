@@ -1,0 +1,83 @@
+.qr-card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.qr-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.qr-gradient-wrapper {
+    background: linear-gradient(90deg, rgba(0, 123, 255, 0.2), rgba(255, 193, 7, 0.2));
+    border-radius: 16px;
+    padding: 16px;
+    display: inline-block;
+}
+
+.qr-wrapper {
+    background-color: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    display: inline-block;
+    cursor: pointer;
+
+    &:hover {
+        transform: scale(1.05);
+        transition: transform 0.2s;
+    }
+}
+
+.qr-placeholder {
+    padding: 20px;
+    color: #000;
+}
+
+.qr-info {
+    margin-top: 16px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.qr-info-text {
+    color: #ff9900;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.qr-expiry {
+    font-size: 12px;
+    color: #666;
+}
+
+.refresh-button,
+.renew-button-inline {
+    margin-top: 16px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.refresh-button {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.refresh-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.renew-button-inline {
+    background-color: #28a745;
+    color: #fff;
+}

@@ -1,0 +1,45 @@
+.info-box {
+    background-color: var(--color-white);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.info-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    margin-bottom: 16px;
+}
+
+.info-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: rgba(var(--primary-color-rgb), 0.2);
+    color: var(--primary-color);
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 28px;
+    margin-right: 12px;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-text {
+    font-size: 15px;
+    color: var(--color-text);
+    line-height: 22px;
+}

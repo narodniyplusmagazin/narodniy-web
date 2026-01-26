@@ -1,0 +1,10 @@
+.disclaimer-box {
+    background-color: rgba(var(--primary-color-rgb), 0.06); // equivalent to primary + "10"
+    border-radius: 12px;
+    padding: 16px;
+    border-left: 4px solid var(--primary-color);
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: var(--color-text);
+    line-height: 20px;
+}

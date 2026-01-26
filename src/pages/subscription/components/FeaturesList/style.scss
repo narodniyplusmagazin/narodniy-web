@@ -1,0 +1,31 @@
+.features-container {
+    margin-bottom: 24px;
+}
+
+.features-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 12px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.feature-icon {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-right: 12px;
+    margin-top: 2px;
+}
+
+.feature-text {
+    flex: 1;
+    font-size: 15px;
+    color: var(--color-text);
+    line-height: 22px;
+}

@@ -1,0 +1,97 @@
+.subscription-card {
+    background: var(--color-white);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 2px solid rgba(var(--color-success-rgb), 0.25);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.active-subscription-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.subscription-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-success);
+}
+
+.subscription-badge {
+    background: rgba(var(--color-success-rgb), 0.15);
+    padding: 6px 12px;
+    border-radius: 12px;
+
+    &.expired {
+        background: rgba(var(--color-error-rgb), 0.15);
+    }
+
+    &.expiring {
+        background: rgba(var(--color-warning-rgb), 0.15);
+    }
+}
+
+.badge-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-success);
+
+    &.warning {
+        color: var(--color-error);
+    }
+}
+
+.subscription-details {
+    margin-bottom: 16px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.label {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.value {
+    font-size: 14px;
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.days-left {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.expiring-text {
+    color: var(--color-warning);
+}
+
+.expired-text {
+    color: var(--color-error);
+}
+
+.subscription-footer {
+    background: rgba(var(--primary-color-rgb), 0.1);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 8px;
+    text-align: center;
+}
+
+.note {
+    font-size: 13px;
+    color: var(--primary-color);
+    font-weight: 500;
+}
