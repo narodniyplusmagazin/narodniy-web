@@ -1,5 +1,6 @@
 import React from 'react';
 import { Smartphone } from 'lucide-react';
+import QRCode from 'react-qr-code';
 import './style.scss';
 
 export const MobileOnlyMessage: React.FC = () => {
@@ -13,6 +14,9 @@ export const MobileOnlyMessage: React.FC = () => {
   if (isMobile) {
     return null;
   }
+
+  // Get current URL
+  const currentUrl = window.location.href;
 
   // Show message on desktop
   return (
@@ -31,11 +35,16 @@ export const MobileOnlyMessage: React.FC = () => {
           <p className="mobile-only-qr-text">
             Отсканируйте QR-код на телефоне для быстрого доступа:
           </p>
-          <div className="mobile-only-qr-placeholder">
-            <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>
-              {window.location.href}
-            </p>
+          <div className="mobile-only-qr-code">
+            <QRCode
+              value={currentUrl}
+              size={200}
+              level="H"
+              bgColor="#ffffff"
+              fgColor="#000000"
+            />
           </div>
+          <p className="mobile-only-url">{currentUrl}</p>
         </div>
         <p className="mobile-only-footer">
           💡 Приложение оптимизировано для экранов смартфонов
