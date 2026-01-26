@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { SecureStorageService } from '../services/secure-storage-service';
 
-// export const API_BASE = 'https://84.201.180.219:80/';
-export const API_BASE = 'http://172.20.10.2:3000/'; // Replace X with your actual IP
+export const API_BASE = 'https://84.201.180.219:80/';
+// export const API_BASE = 'http://172.20.10.2:3000/'; // Replace X with your actual IP
 
 const api = axios.create({
   baseURL: API_BASE,
