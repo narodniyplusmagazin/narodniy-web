@@ -157,6 +157,10 @@ See [src/pages/qr/hooks/useQRScreen.ts](src/pages/qr/hooks/useQRScreen.ts):
 - **Manifest**: `public/manifest.json` defines app name, icons, theme color (#4A90E2)
 - **Service Worker**: `public/sw.js` handles caching (cache-first for assets, network-first for API)
 - **Registration**: Auto-registered in `main.tsx` via `registerServiceWorker()`
+- **Install Prompt**: `InstallPrompt` component shows "Add to Home Screen" button on home page
+  - Auto-detects iOS (shows manual instructions) vs Android (native install)
+  - Dismissible with 7-day cooldown via localStorage
+  - Hides automatically if app already installed
 - **Icons**: Required sizes in `public/icons/` - use `icon-generator.html` for placeholders
 - **Testing**: DevTools → Application tab to verify manifest and service worker
 - See [PWA-SETUP.md](PWA-SETUP.md) for detailed setup guide

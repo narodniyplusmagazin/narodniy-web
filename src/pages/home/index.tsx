@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Gift,
   Star,
@@ -12,10 +12,11 @@ import {
   UserPlus,
   LogIn,
   Rocket,
-} from "lucide-react";
-import "./style.scss";
-import { colors } from "../../shared/constants/theme";
-import { SecureStorageService } from "../../services/secure-storage-service";
+} from 'lucide-react';
+import './style.scss';
+import { colors } from '../../shared/constants/theme';
+import { SecureStorageService } from '../../services/secure-storage-service';
+import { InstallPrompt } from '../../shared/components/InstallPrompt';
 
 interface QuickActionCard {
   id: string;
@@ -33,28 +34,28 @@ export const HomeScreen: React.FC = () => {
 
   const quickActions: QuickActionCard[] = [
     {
-      id: "1",
-      title: "QR Код",
+      id: '1',
+      title: 'QR Код',
       icon: <QrCode size={32} color="white" />,
-      description: "Мой QR код для скидок",
-      route: "/qr",
+      description: 'Мой QR код для скидок',
+      route: '/qr',
       color: colors.primary,
     },
     {
-      id: "2",
-      title: "Подписки",
+      id: '2',
+      title: 'Подписки',
       icon: <CreditCard size={32} color="white" />,
-      description: "Управление подпиской",
-      route: "/subscriptions",
-      color: "#34C759",
+      description: 'Управление подпиской',
+      route: '/subscriptions',
+      color: '#34C759',
     },
     {
-      id: "3",
-      title: "Профиль",
+      id: '3',
+      title: 'Профиль',
       icon: <User size={32} color="white" />,
-      description: "Личные данные",
-      route: "/profile",
-      color: "#FF9500",
+      description: 'Личные данные',
+      route: '/profile',
+      color: '#FF9500',
     },
   ];
 
@@ -64,7 +65,7 @@ export const HomeScreen: React.FC = () => {
         const authenticated = await SecureStorageService.isAuthenticated();
         setIsAuthenticated(authenticated);
       } catch (error) {
-        console.error("Auth check error:", error);
+        console.error('Auth check error:', error);
         setIsAuthenticated(false);
       }
     };
@@ -98,7 +99,10 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <div className="home-screen-container">
-      <div className={`home-screen-wrapper ${fadeIn ? "fade-in" : ""}`}>
+      {/* PWA Install Prompt */}
+      <InstallPrompt />
+
+      <div className={`home-screen-wrapper ${fadeIn ? 'fade-in' : ''}`}>
         {/* Hero Section */}
         <section className="hero-section">
           <div className="image-wrapper">
@@ -111,7 +115,7 @@ export const HomeScreen: React.FC = () => {
             </div>
           </div>
 
-          <h1 className="hero-title">Народный +</h1>
+          <h1 className="hero-title">Народный +asdf</h1>
           <p className="hero-subtitle">
             Получайте эксклюзивные предложения, скидки и привилегии с нашей
             подпиской
@@ -148,16 +152,24 @@ export const HomeScreen: React.FC = () => {
           </h2>
           <div className="features-card">
             <div className="feature-row">
-              <div className="feature-icon-container" style={{ backgroundColor: "#FFF3E6" }}>
+              <div
+                className="feature-icon-container"
+                style={{ backgroundColor: '#FFF3E6' }}
+              >
                 <Gift size={28} color={colors.secondary} />
               </div>
               <div className="feature-content">
                 <h3 className="feature-title">Ежедневные купоны</h3>
-                <p className="feature-text">Уникальные предложения каждый день</p>
+                <p className="feature-text">
+                  Уникальные предложения каждый день
+                </p>
               </div>
             </div>
             <div className="feature-row">
-              <div className="feature-icon-container" style={{ backgroundColor: "#FFF9E6" }}>
+              <div
+                className="feature-icon-container"
+                style={{ backgroundColor: '#FFF9E6' }}
+              >
                 <Star size={28} color={colors.warning} />
               </div>
               <div className="feature-content">
@@ -166,12 +178,17 @@ export const HomeScreen: React.FC = () => {
               </div>
             </div>
             <div className="feature-row">
-              <div className="feature-icon-container" style={{ backgroundColor: "#E6F9F0" }}>
+              <div
+                className="feature-icon-container"
+                style={{ backgroundColor: '#E6F9F0' }}
+              >
                 <DollarSign size={28} color={colors.success} />
               </div>
               <div className="feature-content">
                 <h3 className="feature-title">Экономия до 40%</h3>
-                <p className="feature-text">Реальная выгода на каждой покупке</p>
+                <p className="feature-text">
+                  Реальная выгода на каждой покупке
+                </p>
               </div>
             </div>
           </div>
@@ -183,14 +200,14 @@ export const HomeScreen: React.FC = () => {
             <>
               <button
                 className="primary-button"
-                onClick={() => navigate("/registration")}
+                onClick={() => navigate('/registration')}
               >
                 <UserPlus size={20} />
                 <span>Создать аккаунт</span>
               </button>
               <button
                 className="secondary-button"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate('/login')}
               >
                 <LogIn size={20} />
                 <span>Войти</span>
@@ -199,7 +216,7 @@ export const HomeScreen: React.FC = () => {
           ) : (
             <button
               className="subscribe-button"
-              onClick={() => navigate("/subscriptions")}
+              onClick={() => navigate('/subscriptions')}
             >
               <Rocket size={22} />
               <span>Оформить подписку</span>
