@@ -99,9 +99,6 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <div className="home-screen-container">
-      {/* PWA Install Prompt */}
-      <InstallPrompt />
-
       <div className={`home-screen-wrapper ${fadeIn ? 'fade-in' : ''}`}>
         {/* Hero Section */}
         <section className="hero-section">
@@ -193,6 +190,9 @@ export const HomeScreen: React.FC = () => {
             </div>
           </div>
         </section>
+
+        {/* Install App Button */}
+        <InstallPrompt />
 
         {/* CTA Buttons */}
         <div className="buttons-container">
