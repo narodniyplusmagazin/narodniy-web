@@ -12,17 +12,17 @@ import { MobileOnlyMessage } from './shared/components/MobileOnlyMessage';
 
 function App() {
   // Detect if user is on mobile device
-  const isMobile =
-    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
+  // const isMobile =
+  //   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+  //     navigator.userAgent
+  //   );
 
-  // If not mobile, show only the mobile-only message
-  if (!isMobile) {
-    return <MobileOnlyMessage />;
-  }
+  // // If not mobile, show only the mobile-only message
+  // if (!isMobile) {
+  //   return <MobileOnlyMessage />;
+  // }
 
-  console.log(isMobile);
+  // console.log(isMobile);
 
   // If mobile, show the app normally
   return (
