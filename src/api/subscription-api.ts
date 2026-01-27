@@ -15,7 +15,7 @@ export type SubscriptionType = {
 };
 
 export const createSubscription = async (userId: string) => {
-  const res = await api.post(`/subscriptions/create/`, { userId });
+  const res = await api.post(`/subscriptions/create`, { userId });
   console.log(res.data);
 
   return res.data;
