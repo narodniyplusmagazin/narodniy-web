@@ -151,11 +151,11 @@ npm run preview   # Test production build locally
 
 3. **Commented Code**: Login/registration screens have extensive disabled logic. Represents future features, not dead code.
 
-4. **API Base URL**: Currently `http://84.201.180.219:80/` in production. Update in [src/api/axios-instance.ts](src/api/axios-instance.ts#L4) for local testing.
+4. **API Base URL**: Uses Vercel proxy (`/api`) in production via [vercel.json](vercel.json) rewrite. For local dev, change to `http://172.20.10.2:3000/` in [src/api/axios-instance.ts](src/api/axios-instance.ts#L4).
 
 5. **PWA Icons Missing (CRITICAL)**: [public/manifest.json](public/manifest.json) references `/icons/icon-*.png` but `public/icons/` directory does NOT exist, causing 404 errors in production. **Fix immediately**:
    - Open `icon-generator.html` in browser
-   - Click "Generate All Sizes" 
+   - Click "Generate All Sizes"
    - Create `public/icons/` directory
    - Save all generated icons to `public/icons/`
    - Redeploy to fix manifest errors
