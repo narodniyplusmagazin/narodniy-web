@@ -8,6 +8,7 @@ import {
 } from '../../../api/subscription-api';
 import { SecureStorageService } from '../../../services/secure-storage-service';
 import { generateQR } from '../../../api/qr-services';
+import { useNavigate } from 'react-router-dom';
 
 // Custom alert/confirm system
 const showConfirm = async (title: string, message: string) => {
@@ -18,6 +19,7 @@ export const useSubscriptionScreen = () => {
   const [loading, setLoading] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
   const [plan, setPlan] = useState<SubscriptionType | null>(null);
+  const navigate = useNavigate();
   const [activeSubscription, setActiveSubscription] = useState<any | null>(
     null
   );
@@ -108,7 +110,8 @@ export const useSubscriptionScreen = () => {
       }
 
       alert('Успех\nПодписка успешно оформлена!');
-      window.location.href = '/qr';
+      // window.location.href = '/qr';
+      navigate('/qr');
     } catch (error) {
       console.log(error, 'Ошибка оформления подписки');
     } finally {
@@ -149,7 +152,8 @@ export const useSubscriptionScreen = () => {
       }
 
       alert('Успех\nТестовая подписка создана!');
-      window.location.href = '/qr';
+      // window.location.href = '/qr';
+      navigate('/qr');
     } catch (error) {
       console.log(error, 'Ошибка создания тестовой подписки');
     } finally {
