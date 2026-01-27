@@ -106,7 +106,7 @@ export default function QRScreen() {
         {/* No Subscription */}
         {!subscription ? (
           <NoSubscriptionView
-            onSubscribePress={() => router('/subscriptions')}
+            onSubscribePress={() => router('/subscription')}
           />
         ) : (
           <>

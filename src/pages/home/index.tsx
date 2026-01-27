@@ -46,7 +46,7 @@ export const HomeScreen: React.FC = () => {
       title: 'Подписки',
       icon: <CreditCard size={32} color="white" />,
       description: 'Управление подпиской',
-      route: '/subscriptions',
+      route: '/subscription',
       color: '#34C759',
     },
     {
@@ -216,7 +216,7 @@ export const HomeScreen: React.FC = () => {
           ) : (
             <button
               className="subscribe-button"
-              onClick={() => navigate('/subscriptions')}
+              onClick={() => navigate('/subscription')}
             >
               <Rocket size={22} />
               <span>Оформить подписку</span>
