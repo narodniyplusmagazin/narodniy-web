@@ -8,7 +8,7 @@ import { SubscriptionScreen } from './pages/subscription';
 import QRScreen from './pages/qr/QrScreen';
 import { ProtectedRoute } from './shared/components/ProtectedRoute';
 import { BottomNavigation } from './shared/components/BottomNavigation';
-import { MobileOnlyMessage } from './shared/components/MobileOnlyMessage';
+// import { MobileOnlyMessage } from './shared/components/MobileOnlyMessage';
 
 function App() {
   // Detect if user is on mobile device
