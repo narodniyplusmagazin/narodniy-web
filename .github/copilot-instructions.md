@@ -1,166 +1,197 @@
-# Narodniy Web - AI Coding Instructions
+# Narodniy+ Web - AI Coding Guide
 
-## Project Overview
+**Project**: React 19.2 + TypeScript + Vite PWA for subscription-based QR loyalty program  
+**Domain**: Users authenticate, subscribe to plans, receive dynamic QR codes for in-store scanning with usage tracking
 
-React + TypeScript + Vite web application for a subscription-based QR code system (Narodniy+ loyalty program). Users authenticate, subscribe to plans, and receive dynamic QR codes for in-store use with usage tracking.
+## Architecture Philosophy
 
-## Tech Stack
+**Strict Separation of Concerns**: Pages are pure presentation components. ALL business logic (API calls, state, effects) lives in custom hooks (`hooks/use<PageName>.ts`). Components receive data/callbacks via props only.
 
-- **Framework**: React 19.2 + TypeScript + Vite
-- **Routing**: React Router DOM v7
-- **State**: Zustand (minimal global state) + local React hooks
-- **Styling**: SCSS modules (one `style.scss` per component folder)
-- **HTTP**: Axios with interceptors
-- **Storage**: IndexedDB via custom `SecureStorageService`
-- **Icons**: Lucide React
-- **QR**: `react-qr-code` library
-- **Additional**: `date-fns` (date handling), `immer` (state immutability)
+**Example**: [src/pages/subscription/index.tsx](src/pages/subscription/index.tsx) renders UI, [src/pages/subscription/hooks/useSubscriptionScreen.ts](src/pages/subscription/hooks/useSubscriptionScreen.ts) handles `loadData()`, `subscribe()`, all `useState`/`useEffect` logic.
 
-## Architecture Patterns
+## Critical Patterns
 
-### Page Structure (Feature-Based)
-
-Each page lives in `src/pages/<feature>/` with this structure:
+### Feature-Based Page Structure
 
 ```
 pages/subscription/
-  index.tsx              # Main component exports SubscriptionScreen
-  style.scss             # Page-level styles
-  components/            # Feature-specific components (each with style.scss)
-    SubscriptionHeader/
-      SubscriptionHeader.tsx
-      style.scss
+  index.tsx              # Default export: SubscriptionScreen component
+  style.scss             # Page styles
+  components/            # Feature-scoped UI pieces (each with style.scss)
+    ActiveSubscriptionCard/
   hooks/
-    useSubscriptionScreen.ts  # Business logic hook
+    useSubscriptionScreen.ts  # ALL logic: API, state, effects
 ```
 
-**Critical Pattern**: Pages are _presentation layers only_. All business logic (API calls, state, side effects) belongs in `hooks/use<PageName>.ts`. Components receive data and callbacks via props.
+**Exception**: [src/pages/qr/QrScreen.tsx](src/pages/qr/QrScreen.tsx) uses `QrScreen.tsx` instead of `index.tsx` (legacy naming).
 
-### Custom Hooks Convention
+### Custom Hooks Pattern
 
-Each screen has a corresponding hook (e.g., `useQRScreen`, `useSubscriptionScreen`) that:
+Every screen hook returns:
 
-- Manages local state with `useState`
-- Handles API calls and side effects with `useEffect`
-- Returns state + callback functions for UI
-- Example from [src/pages/subscription/hooks/useSubscriptionScreen.ts](src/pages/subscription/hooks/useSubscriptionScreen.ts#L15-L30)
-
-### API Layer (`src/api/`)
-
-- **axios-instance.ts**: Configured axios with base URL, auth interceptors
-- Request interceptor: Injects `Bearer` token from `SecureStorageService`
-- Response interceptor: Currently handles errors silently (401 handling commented out)
-- Service files (`auth-api.ts`, `qr-services.ts`, `subscription-api.ts`): Export typed API functions
-
-**Important**: Change `API_BASE` in [src/api/axios-instance.ts](src/api/axios-instance.ts#L5) for local dev (currently `http://172.20.10.2:3000/`)
-
-### Storage Strategy
-
-Use `SecureStorageService` (IndexedDB wrapper) for all persistent data:
+- State: `loading`, `error`, `data`
+- Callbacks: `handleAction()` functions
+- Side effects: Managed internally with `useEffect`
 
 ```typescript
-// Keys defined in service
+// From useSubscriptionScreen.ts
+export const useSubscriptionScreen = () => {
+  const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState<SubscriptionType | null>(null);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const subscribe = async () => {
+    /* API call */
+  };
+
+  return { loading, plan, subscribe };
+};
+```
+
+### Storage: IndexedDB-Only
+
+**CRITICAL**: Never use `localStorage`. Use `SecureStorageService` (async IndexedDB wrapper):
+
+```typescript
+// Available keys (from service)
 (AUTH_TOKEN, USER_ID, USER_DATA, SUBSCRIPTION_DATA, BIOMETRIC_ENABLED);
 
-// Usage
+// Usage (always await)
 await SecureStorageService.saveAuthToken(token);
 const userData = await SecureStorageService.getUserData();
+await SecureStorageService.clearAll(); // Logout
 ```
 
-**Never** use localStorage - IndexedDB is asynchronous and more secure.
+Why: Larger capacity, async (non-blocking), better security, supports complex data structures.
 
-### Styling Convention
+### API Layer Structure
 
-- Each component/page folder has its own `style.scss`
-- Global theme colors in [src/shared/constants/theme.ts](src/shared/constants/theme.ts)
-- No CSS-in-JS or inline styles
-- Class naming: Use descriptive kebab-case (e.g., `qr-gradient-wrapper`, `subscription-screen`)
+[src/api/axios-instance.ts](src/api/axios-instance.ts): Configured axios with:
 
-### Routing
+- **Request interceptor**: Auto-injects `Bearer ${token}` from `SecureStorageService`
+- **Response interceptor**: Silent error handling (no alerts), 401 handling commented out
+- **Base URL**: `http://84.201.180.219:80/` (production), change for local dev
 
-Routes defined in [src/App.tsx](src/App.tsx#L10-L17):
+API service files (`auth-api.ts`, `qr-services.ts`, `subscription-api.ts`):
+
+```typescript
+// Pattern: Export typed async functions, return res.data
+export const getMySubscriptions = async (userId: string) => {
+  const res = await api.get(`/subscriptions/user/${userId}`);
+  return res.data;
+};
+```
+
+### Protected Routes
+
+[src/shared/components/ProtectedRoute/ProtectedRoute.tsx](src/shared/components/ProtectedRoute/ProtectedRoute.tsx):
+
+- Async auth check via `SecureStorageService.getAuthToken()`
+- Shows "Загрузка..." during IndexedDB read
+- Redirects to `/login` if unauthenticated
+- Usage: `<Route element={<ProtectedRoute><ProfileScreen /></ProtectedRoute>} />`
+
+### Routing Structure ([src/App.tsx](src/App.tsx))
 
 ```
-/ → HomeScreen
-/registration → RegistrationScreen
-/login → LoginScreen
+/ → HomeScreen (public)
+/registration → RegistrationScreen (public)
+/login → LoginScreen (public)
 /profile → ProfileScreen (protected)
 /subscription → SubscriptionScreen (protected)
 /qr → QRScreen (protected)
 ```
 
-**Protected Routes**: Use `<ProtectedRoute>` wrapper component that checks `SecureStorageService.getAuthToken()` and redirects to `/login` if not authenticated. Shows loading state during async auth check.
+## Key Technologies
 
-### State Management
-
-- **Global**: Zustand store in `src/shared/stores/auth-store.ts` (only `isAuthenticated` flag - minimal usage)
-- **Page-level**: Custom hooks (use\*Screen patterns) - primary state management approach
-- **Component**: Local useState for UI-only state
-- **Persistence**: IndexedDB via SecureStorageService (not Zustand)
+- **State**: Zustand minimal (`auth-store.ts` has single `isAuthenticated` flag), primary state in page hooks
+- **Styling**: SCSS modules (one `style.scss` per component/page), kebab-case classes, theme colors in [src/shared/constants/theme.ts](src/shared/constants/theme.ts)
+- **Navigation**: `useNavigate` from `react-router-dom` (v7)
+- **QR Generation**: `react-qr-code` library, data format: `{ qrCode: string, generatedAt, expiresAt, subscriptionId }`
+- **Icons**: `lucide-react`
+- **Dates**: `date-fns`
 
 ## Development Workflow
 
-### Commands
-
 ```bash
-npm run dev       # Start dev server (Vite)
+npm run dev       # Vite dev server (HMR enabled)
 npm run build     # TypeScript check + production build
 npm run lint      # ESLint
-npm run preview   # Preview production build
+npm run preview   # Test production build locally
 ```
 
-### Adding a New Page
+### Adding a New Feature Page
 
-1. Create folder: `src/pages/<feature-name>/`
-2. Add `index.tsx` (component), `style.scss`, `hooks/use<Feature>Screen.ts`
-3. Create `components/` subfolder for feature-specific UI pieces
-4. Register route in `App.tsx`
-5. Add API service in `src/api/<feature>-api.ts` if needed
+1. Create `src/pages/<feature>/index.tsx` (component), `style.scss`, `hooks/use<Feature>Screen.ts`
+2. Add `components/` subfolder for feature-specific UI
+3. Register route in [src/App.tsx](src/App.tsx): `<Route path="/feature" element={<FeatureScreen />} />`
+4. Create API service in `src/api/<feature>-api.ts` if backend integration needed
+5. Use `<ProtectedRoute>` wrapper if authentication required
 
-### QR Code Flow
+### Adding API Endpoint
+
+1. Open relevant `src/api/<service>-api.ts` file
+2. Add typed async function:
+   ```typescript
+   export const myEndpoint = async (param: string) => {
+     const res = await api.post('/endpoint', { param });
+     return res.data; // Extract data from response
+   };
+   ```
+3. Import/call from page hook (`use*Screen.ts`)
+
+## Current State & Gotchas
+
+1. **Error Handling**: Silent mode active. Check console logs. Response interceptor rejects errors without user-facing messages. 401 auto-logout commented out in [src/api/axios-instance.ts](src/api/axios-instance.ts#L33-L42).
+
+2. **Type Safety**: Progressive typing in progress. Many `any` types remain (especially [src/pages/subscription/hooks/useSubscriptionScreen.ts](src/pages/subscription/hooks/useSubscriptionScreen.ts#L21)). Replace with proper interfaces when editing.
+
+3. **Commented Code**: Login/registration screens have extensive disabled logic. Represents future features, not dead code.
+
+4. **API Base URL**: Currently `http://84.201.180.219:80/` in production. Update in [src/api/axios-instance.ts](src/api/axios-instance.ts#L4) for local testing.
+
+5. **PWA Icons Missing (CRITICAL)**: [public/manifest.json](public/manifest.json) references `/icons/icon-*.png` but `public/icons/` directory does NOT exist, causing 404 errors in production. **Fix immediately**:
+   - Open `icon-generator.html` in browser
+   - Click "Generate All Sizes" 
+   - Create `public/icons/` directory
+   - Save all generated icons to `public/icons/`
+   - Redeploy to fix manifest errors
+
+## QR Code Implementation
 
 See [src/pages/qr/hooks/useQRScreen.ts](src/pages/qr/hooks/useQRScreen.ts):
 
-- Fetches subscription from API (`getMySubscriptions`) or IndexedDB fallback
-- Generates QR via API (`generateQR`, `getTodayToken`) or local fallback
-- QR data includes: `qrCode` (string), `generatedAt`, `expiresAt`, `subscriptionId`
-- Display uses `<QRCode>` from `react-qr-code`
+- **Flow**: `getMySubscriptions(userId)` → `generateQR(subscriptionId, userId)` or `getTodayToken(subscriptionId, userId)`
+- **Fallback**: IndexedDB cache if API fails
+- **Data Structure**: `{ qrCode: string, generatedAt: string, expiresAt: string, subscriptionId: string }`
+- **Display**: `<QRCode value={qrData.qrCode} size={256} />` from `react-qr-code`
+- **Countdown**: 10-second auto-hide timer with manual toggle
 
-## Key Gotchas
+## PWA Configuration
 
-1. **API Base URL**: Hardcoded for local network testing - update for deployment (`http://172.20.10.2:3000/` in axios-instance.ts)
-2. **Error Handling**: Currently silent (alerts/toasts disabled) - check console logs. Response interceptor errors are rejected without user-facing messages.
-3. **Auth Flow**: 401 handling is commented out in axios interceptor - no automatic logout on auth failures
-4. **Type Safety**: Many `any` types remain (especially in subscription hooks) - gradual typing in progress
-5. **Commented Code**: Login/registration screens have extensive commented logic - intended for future implementation
-6. **Protected Routes**: Auth check is async (IndexedDB) - always shows loading state before redirect
-7. **QR Screen Structure**: Uses `QrScreen.tsx` (not `index.tsx`) as entry point - deviates from standard page pattern
+- **Manifest**: [public/manifest.json](public/manifest.json) - name: "Narodniy+ Loyalty Program", theme: #4A90E2
+- **Service Worker**: `public/sw.js` - cache-first for assets, network-first for API
+- **Registration**: Auto-invoked in [src/main.tsx](src/main.tsx) via `registerServiceWorker()`
+- **Install Prompt**: [src/shared/components/InstallPrompt/InstallPrompt.tsx](src/shared/components/InstallPrompt/InstallPrompt.tsx) detects iOS (manual instructions) vs Android (native)
+- **Testing**: Chrome DevTools → Application tab → Manifest/Service Workers
+- **Docs**: [PWA-SETUP.md](PWA-SETUP.md), [PWA-QUICKSTART.md](PWA-QUICKSTART.md), [PWA-IMPLEMENTATION.md](PWA-IMPLEMENTATION.md)
 
-## Common Tasks
+## File Organization
 
-**Adding API endpoint**: Create typed function in `src/api/<service>-api.ts`, return `res.data`  
-**New component**: Create folder with `ComponentName.tsx` + `style.scss`, use FC type  
-**State in page**: Add to corresponding `use*Screen` hook, pass down as props  
-**Persist data**: Use `SecureStorageService` methods (async) - available keys: `AUTH_TOKEN`, `USER_ID`, `USER_DATA`, `SUBSCRIPTION_DATA`, `BIOMETRIC_ENABLED`  
-**Navigate**: Import `useNavigate` from `react-router-dom`  
-**Protected route**: Wrap route element in `<ProtectedRoute>` component in App.tsx
+- **Feature Components**: `src/pages/<feature>/components/<Component>/Component.tsx` + `style.scss`
+- **Shared Components**: `src/shared/components/<Component>/Component.tsx` + `index.ts` (re-export)
+- **Types**: Inline in service files/hooks (no global `types/` folder yet)
+- **Hooks**: `src/pages/<feature>/hooks/use<Feature>Screen.ts` (page-level), `src/shared/hooks/` (reusable)
+- **Config**: Root-level `vite.config.ts`, `tsconfig.*.json`, `eslint.config.js`
 
-## File Locations
+## Quick Reference
 
-- Components: `src/pages/<feature>/components/` (feature-specific) or `src/shared/components/` (reusable)
-- Types: Defined inline in service files or hooks (no global types/ folder yet)
-- Config: `vite.config.ts`, `tsconfig.app.json`, `eslint.config.js`
-- PWA: `public/manifest.json`, `public/sw.js`, `src/utils/registerServiceWorker.ts`
-
-## PWA Setup
-
-- **Manifest**: `public/manifest.json` defines app name, icons, theme color (#4A90E2)
-- **Service Worker**: `public/sw.js` handles caching (cache-first for assets, network-first for API)
-- **Registration**: Auto-registered in `main.tsx` via `registerServiceWorker()`
-- **Install Prompt**: `InstallPrompt` component shows "Add to Home Screen" button on home page
-  - Auto-detects iOS (shows manual instructions) vs Android (native install)
-  - Dismissible with 7-day cooldown via localStorage
-  - Hides automatically if app already installed
-- **Icons**: Required sizes in `public/icons/` - use `icon-generator.html` for placeholders
-- **Testing**: DevTools → Application tab to verify manifest and service worker
-- See [PWA-SETUP.md](PWA-SETUP.md) for detailed setup guide
+- **Navigate programmatically**: `const navigate = useNavigate(); navigate('/path');`
+- **Access auth token**: `await SecureStorageService.getAuthToken()`
+- **Check subscription active**: Compare `new Date()` with `subscription.startDate`/`endDate`
+- **Component naming**: PascalCase files/exports, kebab-case CSS classes
+- **State debugging**: Console logs in hooks (no error UI yet)
+- **Mobile detection**: Commented out in [src/App.tsx](src/App.tsx#L14-L25), `MobileOnlyMessage` component available
