@@ -5,7 +5,6 @@ export const API_BASE = 'http://84.201.180.219:80/';
 // export const API_BASE = 'http://172.20.10.2:3000/'; // Replace X with your actual IP
 
 const api = axios.create({
-  baseURL: API_BASE,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
