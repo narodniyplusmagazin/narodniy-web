@@ -34,7 +34,7 @@ export const changePassword = async () => {};
 export type RegisterDto = {
   fullName: string;
   phone: string;
-  email: string;
+  email?: string | null; // Optional
   gender: 'male' | 'female';
   password: string;
   acceptTerms: boolean;

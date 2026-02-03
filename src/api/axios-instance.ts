@@ -2,7 +2,9 @@ import axios from 'axios';
 import { SecureStorageService } from '../services/secure-storage-service';
 
 export const API_BASE = '/api'; // Vercel proxy handles routing to http://84.201.180.219:80/
-// export const API_BASE = 'http://172.20.10.2:3000/'; // For local dev with backend server
+// export const API_BASE = 'http://84.201.180.219:80/'; // Vercel proxy handles routing to http://84.201.180.219:80/
+
+// export const API_BASE = 'http://localhost:5050/'; // For local dev with backend server
 
 const api = axios.create({
   baseURL: API_BASE,

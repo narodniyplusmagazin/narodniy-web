@@ -10,7 +10,7 @@ import { useAuthStore } from '../../shared/stores/auth-store';
 export type RegistrationForm = {
   fullName: string;
   phone: string;
-  email: string;
+  email?: string | null;
   gender: 'male' | 'female';
   password: string;
   code: string;
@@ -21,7 +21,7 @@ export const RegistrationScreen: React.FC = () => {
   const [form, setForm] = useState<RegistrationForm>({
     fullName: '',
     phone: '+7',
-    email: '',
+    email: null,
     gender: 'male',
     password: '',
     code: '',
@@ -170,7 +170,7 @@ export const RegistrationScreen: React.FC = () => {
                 type="email"
                 className="form-input"
                 placeholder="example@mail.com"
-                value={form.email}
+                value={form.email || ''}
                 onChange={(e) =>
                   setForm({
                     ...form,

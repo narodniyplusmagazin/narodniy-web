@@ -82,6 +82,7 @@ export default function QRScreen() {
   };
 
   const progressWidth = () => `${progressValue * 100}%`;
+  console.log(usageStats);
 
   return (
     <div className="qr-screen-container">
