@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getTodayToken } from '../../../api/qr-services';
+import { getTodayToken, getQrUsages } from '../../../api/qr-services';
 import { SecureStorageService } from '../../../services/secure-storage-service';
 
 export interface Subscription {
@@ -99,6 +99,26 @@ export const useQRScreen = () => {
     [subscription?.id]
   );
 
+  // Load usage statistics
+  const loadUsageStats = useCallback(
+    async (subscriptionId: string) => {
+      try {
+        const stats = await getQrUsages(subscriptionId);
+        setUsageStats(stats);
+      } catch {
+        setUsageStats({
+          totalUsages: 0,
+          usagesToday: 0,
+          usagesThisWeek: 0,
+          usagesThisMonth: 0,
+          maxUsagesPerDay: subscription?.maxUsagesPerDay || 5,
+          history: [],
+        });
+      }
+    },
+    [subscription?.maxUsagesPerDay]
+  );
+
   // Generate QR code
   const generateQRCode = useCallback(
     async (subscriptionId: string) => {
@@ -118,14 +138,8 @@ export const useQRScreen = () => {
         // Получаем сегодняшний токен
         const response = await getTodayToken(subscriptionId);
 
-        setUsageStats({
-          totalUsages: response.usageCount,
-          usagesToday: response.usageCount,
-          usagesThisWeek: response.usageCount,
-          usagesThisMonth: 0,
-          maxUsagesPerDay: response.dailyLimit,
-          history: [],
-        });
+        // Загружаем статистику использования
+        await loadUsageStats(subscriptionId);
 
         if (!response.token) {
           console.error('❌ No token in response');
@@ -156,28 +170,8 @@ export const useQRScreen = () => {
         generateLocalQR(subscriptionId);
       }
     },
-    [generateLocalQR]
+    [generateLocalQR, loadUsageStats]
   );
-
-  // Load usage statistics
-  //   const loadUsageStats = useCallback(
-  //     async (subscriptionId: string) => {
-  //       try {
-  //         const stats = await getQrUsages(subscriptionId);
-  //         setUsageStats(stats);
-  //       } catch {
-  //         setUsageStats({
-  //           totalUsages: 0,
-  //           usagesToday: 0,
-  //           usagesThisWeek: 0,
-  //           usagesThisMonth: 0,
-  //           maxUsagesPerDay: subscription?.maxUsagesPerDay || 5,
-  //           history: [],
-  //         });
-  //       }
-  //     },
-  //     [subscription?.maxUsagesPerDay]
-  //   );
 
   // Load all data
   const loadInitialData = async () => {
@@ -230,14 +224,8 @@ export const useQRScreen = () => {
 
           const response = await getTodayToken(subscription.id);
 
-          setUsageStats({
-            totalUsages: response.usageCount || 0,
-            usagesToday: response.usageCount || 0,
-            usagesThisWeek: response.usageCount || 0,
-            usagesThisMonth: 0,
-            maxUsagesPerDay: response.dailyLimit || 5,
-            history: [],
-          });
+          // Загружаем статистику использования
+          await loadUsageStats(subscription.id);
 
           if (response.token) {
             let tokenString: string;

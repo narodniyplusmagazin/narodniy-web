@@ -57,10 +57,10 @@ export const getTodayToken = async (
 };
 
 // POST /qr/use/:subscriptionId - Отметить использование QR кода
-export const markQrUsage = async (subscriptionId: string) => {
-  const response = await api.post(`qr/use/${subscriptionId}`);
-  return response.data;
-};
+// export const markQrUsage = async (subscriptionId: string) => {
+//   const response = await api.post(`qr/use/${subscriptionId}`);
+//   return response.data;
+// };
 
 // GET /qr/usages/:subscriptionId - Получить статистику использования
 export const getQrUsages = async (
