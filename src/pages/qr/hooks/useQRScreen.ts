@@ -25,6 +25,7 @@ export interface UsageStats {
   usagesThisWeek: number;
   usagesThisMonth: number;
   maxUsagesPerDay: number;
+  remainingUses: number;
   history: {
     usedAt: string;
     location?: string;
@@ -103,8 +104,39 @@ export const useQRScreen = () => {
   const loadUsageStats = useCallback(
     async (subscriptionId: string) => {
       try {
-        const stats = await getQrUsages(subscriptionId);
-        setUsageStats(stats);
+        const apiStats = await getQrUsages(subscriptionId);
+
+        // Calculate time-based stats from usage history
+        const now = new Date();
+        const today = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate()
+        );
+        const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        const usagesToday = apiStats.usages.filter(
+          (u) => new Date(u.usedAt) >= today
+        ).length;
+
+        const usagesThisWeek = apiStats.usages.filter(
+          (u) => new Date(u.usedAt) >= weekAgo
+        ).length;
+
+        const usagesThisMonth = apiStats.usages.filter(
+          (u) => new Date(u.usedAt) >= monthAgo
+        ).length;
+
+        setUsageStats({
+          totalUsages: apiStats.usageCount,
+          usagesToday: usagesToday,
+          usagesThisWeek: usagesThisWeek,
+          usagesThisMonth: usagesThisMonth,
+          maxUsagesPerDay: apiStats.dailyLimit,
+          remainingUses: apiStats.remainingUses,
+          history: apiStats.usages,
+        });
       } catch {
         setUsageStats({
           totalUsages: 0,
@@ -112,6 +144,7 @@ export const useQRScreen = () => {
           usagesThisWeek: 0,
           usagesThisMonth: 0,
           maxUsagesPerDay: subscription?.maxUsagesPerDay || 5,
+          remainingUses: subscription?.maxUsagesPerDay || 5,
           history: [],
         });
       }

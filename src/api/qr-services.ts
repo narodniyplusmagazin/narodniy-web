@@ -23,15 +23,13 @@ export interface QRTodayTokenResponse {
 
 // Response from GET /qr/usages/:subscriptionId
 export interface QRUsageStats {
-  totalUsages: number;
-  usagesToday: number;
-  usagesThisWeek: number;
-  usagesThisMonth: number;
-  maxUsagesPerDay: number;
-  history: {
+  usages: Array<{
     usedAt: string;
     location?: string;
-  }[];
+  }>;
+  usageCount: number;
+  remainingUses: number;
+  dailyLimit: number;
 }
 
 // POST /qr/generate - Генерирует ежедневный QR код
