@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { generateQR, getTodayToken } from '../../../api/qr-services';
+import { getTodayToken } from '../../../api/qr-services';
 import { SecureStorageService } from '../../../services/secure-storage-service';
 
 export interface Subscription {
@@ -115,25 +115,17 @@ export const useQRScreen = () => {
           throw new Error('User ID not found');
         }
 
-        let response;
+        // Получаем сегодняшний токен
+        const response = await getTodayToken(subscriptionId);
 
-        // Сначала пытаемся получить сегодняшний токен
-        try {
-          response = await getTodayToken(subscriptionId);
-          setUsageStats({
-            totalUsages: response.usageCount,
-            usagesToday: response.usageCount,
-            usagesThisWeek: response.usageCount,
-            usagesThisMonth: 0,
-            maxUsagesPerDay: response.dailyLimit,
-            history: [],
-          });
-        } catch (todayError) {
-          console.log(todayError);
-
-          // Если токена на сегодня нет, генерируем новый
-          response = await generateQR(subscriptionId, userData.id);
-        }
+        setUsageStats({
+          totalUsages: response.usageCount,
+          usagesToday: response.usageCount,
+          usagesThisWeek: response.usageCount,
+          usagesThisMonth: 0,
+          maxUsagesPerDay: response.dailyLimit,
+          history: [],
+        });
 
         if (!response.token) {
           console.error('❌ No token in response');
@@ -236,22 +228,16 @@ export const useQRScreen = () => {
             throw new Error('User ID not found');
           }
 
-          let response;
-          try {
-            response = await getTodayToken(subscription.id);
-            setUsageStats({
-              totalUsages: response.usageCount || 0,
-              usagesToday: 0,
-              usagesThisWeek: 0,
-              usagesThisMonth: 0,
-              maxUsagesPerDay: response.dailyLimit || 5,
-              history: [],
-            });
-          } catch (todayError) {
-            console.log(todayError);
+          const response = await getTodayToken(subscription.id);
 
-            response = await generateQR(subscription.id, userData.id);
-          }
+          setUsageStats({
+            totalUsages: response.usageCount || 0,
+            usagesToday: response.usageCount || 0,
+            usagesThisWeek: response.usageCount || 0,
+            usagesThisMonth: 0,
+            maxUsagesPerDay: response.dailyLimit || 5,
+            history: [],
+          });
 
           if (response.token) {
             let tokenString: string;
@@ -327,12 +313,7 @@ export const useQRScreen = () => {
     try {
       setLoading(true);
 
-      const userData = await SecureStorageService.getUserData();
-      if (!userData?.id) {
-        throw new Error('User ID not found');
-      }
-
-      const response = await generateQR(subscription.id, userData.id);
+      const response = await getTodayToken(subscription.id);
 
       // Конвертируем токен в строку, если это объект
       let tokenString: string;
@@ -369,6 +350,7 @@ export const useQRScreen = () => {
   // Load data on mount and when screen comes into focus
   useEffect(() => {
     loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // Refresh QR on mount
   useEffect(() => {
