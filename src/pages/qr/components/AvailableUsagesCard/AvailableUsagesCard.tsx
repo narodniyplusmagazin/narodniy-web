@@ -5,14 +5,16 @@ import { Check } from 'lucide-react';
 interface AvailableUsagesCardProps {
   usagesToday: number;
   maxUsagesPerDay: number;
+  remainingUses: number;
 }
 
 export const AvailableUsagesCard: React.FC<AvailableUsagesCardProps> = ({
-  usagesToday,
   maxUsagesPerDay,
+  remainingUses,
 }) => {
-  const remainingUsages = Math.max(0, maxUsagesPerDay - usagesToday);
-  const usagePercentage = (usagesToday / maxUsagesPerDay) * 100;
+  const remainingUsages = Math.max(0, remainingUses);
+  const usedCount = maxUsagesPerDay - remainingUsages;
+  const usagePercentage = (usedCount / maxUsagesPerDay) * 100;
 
   const getStatusColor = () => {
     if (remainingUsages === 0) return 'tomato';
@@ -37,13 +39,13 @@ export const AvailableUsagesCard: React.FC<AvailableUsagesCardProps> = ({
               className="available-usage-circle"
               style={{
                 backgroundColor:
-                  index < usagesToday
+                  index < usedCount
                     ? 'var(--text-secondary)'
                     : getStatusColor(),
-                opacity: index < usagesToday ? 0.3 : 1,
+                opacity: index < usedCount ? 0.3 : 1,
               }}
             >
-              {index < usagesToday ? (
+              {index < usedCount ? (
                 <Check size={20} color="white" />
               ) : (
                 <span className="available-usage-circle-text">{index + 1}</span>

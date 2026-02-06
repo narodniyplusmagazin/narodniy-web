@@ -123,6 +123,7 @@ export default function QRScreen() {
               <AvailableUsagesCard
                 usagesToday={usageStats.usagesToday}
                 maxUsagesPerDay={usageStats.maxUsagesPerDay}
+                remainingUses={usageStats.remainingUses}
               />
             )}
 
