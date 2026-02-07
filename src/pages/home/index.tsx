@@ -112,7 +112,7 @@ export const HomeScreen: React.FC = () => {
             </div>
           </div>
 
-          <h1 className="hero-title">Народный +asdf</h1>
+          <h1 className="hero-title">Народный +</h1>
           <p className="hero-subtitle">
             Получайте эксклюзивные предложения, скидки и привилегии с нашей
             подпиской

@@ -79,7 +79,6 @@ export const QRCodeCard: FC<QRCodeCardProps> = ({
           <div className="qr-info">
             <p className="qr-info-text">🔒 Не передавайте код третьим лицам</p>
 
-            {JSON.stringify(qrData)}
             {qrData && (
               <p className="qr-expiry">
                 Действителен до:{' '}

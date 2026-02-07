@@ -36,14 +36,6 @@ export default function QRScreen() {
     return 'success';
   };
 
-  //   const getQRValue = () => {
-  //     if (!qrData || !qrData.qrCode) return null;
-  //     if (typeof qrData.qrCode === 'object') return JSON.stringify(qrData.qrCode);
-  //     if (typeof qrData.qrCode === 'string' && qrData.qrCode.length > 1000)
-  //       return qrData.qrCode.substring(0, 1000);
-  //     return qrData.qrCode;
-  //   };
-
   // CSS-based progress animation
   useEffect(() => {
     if (qrVisible) {

@@ -36,6 +36,11 @@ export const RegistrationScreen: React.FC = () => {
     return phoneRegex.test(phone);
   };
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleRegistration = async () => {
     if (!form.fullName.trim()) {
       alert('Ошибка валидации - Введите полное имя');
@@ -54,6 +59,12 @@ export const RegistrationScreen: React.FC = () => {
         ' Неверный формат телефона. Используйте формат: +7XXXXXXXXXX или 8XXXXXXXXXX'
       );
 
+      return;
+    }
+
+    // Validate email only if it's provided and not empty
+    if (form.email && form.email.trim() && !validateEmail(form.email.trim())) {
+      alert('Ошибка валидации - Неверный формат email');
       return;
     }
 
@@ -167,16 +178,17 @@ export const RegistrationScreen: React.FC = () => {
                 Email
               </label>
               <input
-                type="email"
+                type="text"
                 className="form-input"
                 placeholder="example@mail.com"
                 value={form.email || ''}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const value = e.target.value.toLowerCase().trim();
                   setForm({
                     ...form,
-                    email: e.target.value.toLowerCase().trim(),
-                  })
-                }
+                    email: value === '' ? null : value,
+                  });
+                }}
               />
             </div>
 
