@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { SecureStorageService } from '../services/secure-storage-service';
 
-// export const API_BASE = 'https://narodniyplus.ru/';
+export const API_BASE = 'https://narodniyplus.ru/';
 
-export const API_BASE = ' http://localhost:5050/';
+// export const API_BASE = ' http://localhost:5050/';
 
 const api = axios.create({
   baseURL: API_BASE,
