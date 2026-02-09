@@ -20,7 +20,6 @@ interface SubscriptionActionsProps {
 export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
   isActive,
   subscribing,
-  onTestSubscription,
   subscriptionPlanId,
   hasActiveSubscription = false,
   userId,
@@ -64,7 +63,7 @@ export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
 
   return (
     <div className="subscription-actions">
-      <button
+      {/* <button
         className={`button ${isDisabled ? 'button-disabled' : ''}`}
         onClick={onTestSubscription}
         disabled={isDisabled}
@@ -72,14 +71,17 @@ export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
         {hasActiveSubscription
           ? 'У вас уже есть подписку'
           : 'Оформить подписку'}
-      </button>
+      </button> */}
 
       <button
         className={`button ${isDisabled ? 'button-disabled' : ''}`}
         onClick={handleRealPayment}
         disabled={isDisabled}
       >
-        {paymentLoading ? 'Обработка...' : 'Оформить подписку real'}
+        {hasActiveSubscription
+          ? 'У вас уже есть подписку'
+          : 'Оформить подписку'}
+        {/* {paymentLoading ? 'Обработка...' : 'Оформить подписку '} */}
       </button>
 
       {paymentError && (
