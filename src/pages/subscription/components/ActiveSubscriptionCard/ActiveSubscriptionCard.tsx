@@ -29,8 +29,6 @@ export const ActiveSubscriptionCard: React.FC<ActiveSubscriptionCardProps> = ({
     }
   };
 
-  console.log(subscription);
-
   const getDaysLeft = () => {
     const now = new Date();
     const endDate = new Date(subscription.endDate);

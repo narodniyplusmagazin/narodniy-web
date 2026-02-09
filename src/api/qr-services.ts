@@ -49,6 +49,8 @@ export const generateQR = async (
 export const getTodayToken = async (
   subscriptionId: string
 ): Promise<QRTodayTokenResponse> => {
+  console.log(subscriptionId);
+
   const response = await api.get(`qr/today/${subscriptionId}`);
 
   return response.data;

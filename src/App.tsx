@@ -9,23 +9,8 @@ import QRScreen from './pages/qr/QrScreen';
 import { PrivacyPolicyScreen } from './pages/privacy-policy';
 import { ProtectedRoute } from './shared/components/ProtectedRoute';
 import { BottomNavigation } from './shared/components/BottomNavigation';
-// import { MobileOnlyMessage } from './shared/components/MobileOnlyMessage';
 
 function App() {
-  // Detect if user is on mobile device
-  // const isMobile =
-  //   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-  //     navigator.userAgent
-  //   );
-
-  // // If not mobile, show only the mobile-only message
-  // if (!isMobile) {
-  //   return <MobileOnlyMessage />;
-  // }
-
-  // console.log(isMobile);
-
-  // If mobile, show the app normally
   return (
     <>
       <Routes>

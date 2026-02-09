@@ -14,7 +14,6 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const checkAuth = async () => {
       try {
         const token = await SecureStorageService.getAuthToken();
-        console.log(token);
 
         setIsAuthenticated(!!token);
       } catch (error) {

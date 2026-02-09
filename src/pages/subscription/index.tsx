@@ -19,6 +19,7 @@ export const SubscriptionScreen: React.FC = () => {
     subscribing,
     plan,
     activeSubscription,
+    userData,
     loadSubscriptionPlan,
     handleSubscribe,
     handleTestSubscription,
@@ -28,12 +29,8 @@ export const SubscriptionScreen: React.FC = () => {
 
   if (!plan) return <ErrorState onRetry={loadSubscriptionPlan} />;
 
-  console.log(activeSubscription);
-
   return (
     <div className="subscription-screen">
-      {/* <Loading visible={subscribing} text="Оформление подписки..." /> */}
-
       <main className="scroll-content">
         <SubscriptionHeader
           planName={plan.name}
@@ -48,11 +45,17 @@ export const SubscriptionScreen: React.FC = () => {
           <SubscriptionDetails plan={plan} />
           <FeaturesList features={plan.features} />
           <SubscriptionActions
+            subscriptionPlanId={plan.id}
             isActive={!!plan && !activeSubscription}
             subscribing={subscribing}
             onSubscribe={handleSubscribe}
             onTestSubscription={handleTestSubscription}
             hasActiveSubscription={!!activeSubscription}
+            userId={userData?.id}
+            userEmail={userData?.email}
+            userPhone={userData?.phone}
+            userData={userData}
+            activeSubscription={activeSubscription}
           />
         </SubscriptionPlanCard>
 

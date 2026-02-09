@@ -1,10 +1,9 @@
 import axios from 'axios';
 import { SecureStorageService } from '../services/secure-storage-service';
 
-// export const API_BASE = '/api'; // Vercel proxy handles routing to http://84.201.180.219:80/
-export const API_BASE = ' https://narodniyplus.ru/'; // Vercel proxy handles routing to http://84.201.180.219:80/
+// export const API_BASE = 'https://narodniyplus.ru/';
 
-// export const API_BASE = 'https://narodniyplus.ru/'; // For local dev with backend server
+export const API_BASE = ' http://localhost:5050/';
 
 const api = axios.create({
   baseURL: API_BASE,

@@ -16,7 +16,6 @@ export type SubscriptionType = {
 
 export const createSubscription = async (userId: string) => {
   const res = await api.post(`/subscriptions/create`, { userId });
-  console.log(res.data);
 
   return res.data;
 };
@@ -43,5 +42,6 @@ export const getSubscriptions = async (userId: string) => {
 
 export const getMySubscriptions = async (userId: string) => {
   const res = await api.get(`/subscriptions/my-subscriptions/${userId}`);
+
   return res.data;
 };

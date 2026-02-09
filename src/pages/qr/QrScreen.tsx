@@ -74,20 +74,9 @@ export default function QRScreen() {
   };
 
   const progressWidth = () => `${progressValue * 100}%`;
-  console.log(usageStats);
 
   return (
     <div className="qr-screen-container">
-      {/* QR Fullscreen Modal */}
-      {/* {qrData && getQRValue() && (
-        <QRFullscreen
-          visible={showQRFullscreen}
-          onClose={() => setShowQRFullscreen(false)}
-          qrValue={getQRValue()!}
-          expiresAt={qrData.expiresAt}
-        />
-      )} */}
-
       <div className="qr-scroll-container">
         {/* Header */}
         <QRHeader
@@ -96,7 +85,6 @@ export default function QRScreen() {
           maxUsagesPerDay={usageStats?.maxUsagesPerDay}
         />
 
-        {/* No Subscription */}
         {!subscription ? (
           <NoSubscriptionView
             onSubscribePress={() => router('/subscription')}
@@ -158,16 +146,6 @@ export default function QRScreen() {
                 </button>
                 <p className="qr-show-hint">QR-код скрыт для безопасности</p>
               </div>
-            )}
-
-            {daysLeft <= 7 && (
-              <button
-                className="renew-button"
-                onClick={() => router('/subscription')}
-              >
-                <span className="renew-icon">⭐</span>
-                <span>Продлить подписку</span>
-              </button>
             )}
           </>
         )}

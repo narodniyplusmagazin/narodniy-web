@@ -23,6 +23,7 @@ export const useSubscriptionScreen = () => {
   const [activeSubscription, setActiveSubscription] = useState<any | null>(
     null
   );
+  const [userData, setUserData] = useState<any | null>(null);
 
   useEffect(() => {
     loadData();
@@ -30,8 +31,18 @@ export const useSubscriptionScreen = () => {
   }, []);
 
   const loadData = async () => {
+    await loadUserData();
     await loadSubscriptionPlan();
     await loadActiveSubscription();
+  };
+
+  const loadUserData = async () => {
+    try {
+      const data = await SecureStorageService.getUserData();
+      setUserData(data);
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
   };
 
   const loadSubscriptionPlan = async () => {
@@ -166,6 +177,7 @@ export const useSubscriptionScreen = () => {
     subscribing,
     plan,
     activeSubscription,
+    userData,
     loadSubscriptionPlan,
     handleSubscribe,
     handleTestSubscription,
