@@ -11,12 +11,14 @@ export type Payment = {
 export const createPayment = async (
   subscriptionId: string,
   userId: string,
-  userEmail: string
+  userEmail: string,
+  redirectUrl: string
 ) => {
   const res = await api.post<Payment>(`/payments/create`, {
     subscriptionId,
     userId,
     userEmail,
+    redirectUrl,
   });
 
   return res.data;
