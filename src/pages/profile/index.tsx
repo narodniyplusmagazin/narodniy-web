@@ -52,7 +52,11 @@ export const ProfileScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      await resetPassword(form.oldPassword, form.newPassword, '');
+      await resetPassword(
+        user?.email || user?.phone || '',
+        form.newPassword,
+        ''
+      );
       alert('Пароль успешно изменён');
       setForm({ oldPassword: '', newPassword: '' });
     } catch (err) {
@@ -107,6 +111,20 @@ export const ProfileScreen: React.FC = () => {
         return 'Не указан';
     }
   };
+
+  // const handleResetPassword = async () => {
+  //   try {
+  //     const response = await resetPassword(
+  //       user?.email || user?.phone || '',
+  //       form.newPassword,
+  //       ''
+  //     );
+
+  //     console.log(response);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   return (
     <div className="profile-container">
