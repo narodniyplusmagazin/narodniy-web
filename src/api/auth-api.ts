@@ -71,13 +71,13 @@ export const forgotPassword = async (emailOrPhone: string) => {
 
 export const resetPassword = async (
   emailOrPhone: string,
-  otp: string,
-  newPassword: string
+  newPassword: string,
+  otp: string
 ) => {
   const res = await api.post('/users/reset-password', {
     emailOrPhone,
-    otp,
     newPassword,
+    otp: otp || '',
   });
   return res.data;
 };

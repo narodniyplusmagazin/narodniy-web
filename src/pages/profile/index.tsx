@@ -20,7 +20,7 @@ import {
   type UserDataType,
 } from '../../services/secure-storage-service';
 import { useAuthStore } from '../../shared/stores/auth-store';
-import { changePassword, deleteAccount } from '../../api/auth-api';
+import { deleteAccount, resetPassword } from '../../api/auth-api';
 
 export const ProfileScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ export const ProfileScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      await changePassword();
+      await resetPassword(form.oldPassword, form.newPassword, '');
       alert('Пароль успешно изменён');
       setForm({ oldPassword: '', newPassword: '' });
     } catch (err) {
