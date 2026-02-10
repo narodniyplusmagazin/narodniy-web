@@ -8,16 +8,20 @@ export type Payment = {
   amount: number;
 };
 
+export type CreatePaymentRequest = {
+  contactInfo: string;
+  userId: string;
+  redirectUrl: string;
+};
+
 export const createPayment = async (
-  subscriptionId: string,
+  contactInfo: string,
   userId: string,
-  userEmail: string,
   redirectUrl: string
 ) => {
   const res = await api.post<Payment>(`/payments/create`, {
-    subscriptionId,
+    contactInfo,
     userId,
-    userEmail,
     redirectUrl,
   });
 

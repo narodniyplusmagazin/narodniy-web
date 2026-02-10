@@ -20,7 +20,6 @@ interface SubscriptionActionsProps {
 export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
   isActive,
   subscribing,
-  subscriptionPlanId,
   hasActiveSubscription = false,
   userId,
   userEmail,
@@ -43,9 +42,8 @@ export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
       setPaymentError(null);
 
       const paymentData = await createPayment(
-        subscriptionPlanId,
-        userId,
         userEmail || userPhone,
+        userId,
         'https://narodniyplus.ru/profile'
       );
 
