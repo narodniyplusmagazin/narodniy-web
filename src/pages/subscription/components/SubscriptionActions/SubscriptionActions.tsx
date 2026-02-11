@@ -6,7 +6,7 @@ import { createPayment } from '../../../../api/payment-service';
 interface SubscriptionActionsProps {
   isActive: boolean;
   subscribing: boolean;
-  onSubscribe: () => void;
+  // onSubscribe: () => void;
   onTestSubscription: () => void;
   hasActiveSubscription?: boolean;
   subscriptionPlanId: string;

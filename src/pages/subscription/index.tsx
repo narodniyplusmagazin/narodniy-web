@@ -21,7 +21,7 @@ export const SubscriptionScreen: React.FC = () => {
     activeSubscription,
     userData,
     loadSubscriptionPlan,
-    handleSubscribe,
+    // handleSubscribe,
     handleTestSubscription,
   } = useSubscriptionScreen();
 
@@ -48,7 +48,7 @@ export const SubscriptionScreen: React.FC = () => {
             subscriptionPlanId={plan.id}
             isActive={!!plan && !activeSubscription}
             subscribing={subscribing}
-            onSubscribe={handleSubscribe}
+            // onSubscribe={handleSubscribe}
             onTestSubscription={handleTestSubscription}
             hasActiveSubscription={!!activeSubscription}
             userId={userData?.id}
