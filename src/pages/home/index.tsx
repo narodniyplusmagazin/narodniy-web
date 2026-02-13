@@ -35,7 +35,7 @@ export const HomeScreen: React.FC = () => {
   const quickActions: QuickActionCard[] = [
     {
       id: '1',
-      title: 'QR Код',
+      title: 'QR Код 123',
       icon: <QrCode size={32} color="white" />,
       description: 'Мой QR код для скидок',
       route: '/qr',
