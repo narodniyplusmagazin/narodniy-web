@@ -81,9 +81,9 @@ export const RegistrationScreen: React.FC = () => {
     try {
       const res = await registration(form);
 
-      await SecureStorageService.saveAuthToken(res.access_token);
+      SecureStorageService.saveAuthToken(res.access_token);
       if (res.user) {
-        await SecureStorageService.saveUserData(res.user);
+        SecureStorageService.saveUserData(res.user);
       }
 
       alert('Регистрация прошла успешно!');

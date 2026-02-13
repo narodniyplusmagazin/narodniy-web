@@ -163,7 +163,7 @@ export const useQRScreen = () => {
 
         setQrError(null);
 
-        const userData = await SecureStorageService.getUserData();
+        const userData = SecureStorageService.getUserData();
         if (!userData?.id) {
           throw new Error('User ID not found');
         }
@@ -212,13 +212,13 @@ export const useQRScreen = () => {
       setLoading(true);
       setQrError(null);
 
-      const isAuth = await SecureStorageService.getAuthToken();
+      const isAuth = SecureStorageService.getAuthToken();
       if (!isAuth) {
         router('/login');
         return;
       }
 
-      const subscriptionData = await SecureStorageService.getSubscription();
+      const subscriptionData = SecureStorageService.getSubscription();
 
       if (!subscriptionData || !subscriptionData.id) {
         setLoading(false);
@@ -250,7 +250,7 @@ export const useQRScreen = () => {
       // Generate QR code inline
       try {
         if (subscription.id) {
-          const userData = await SecureStorageService.getUserData();
+          const userData = SecureStorageService.getUserData();
           if (!userData?.id) {
             throw new Error('User ID not found');
           }

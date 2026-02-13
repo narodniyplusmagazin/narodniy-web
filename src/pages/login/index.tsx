@@ -43,12 +43,12 @@ export const LoginScreen: React.FC = () => {
         return;
       }
 
-      await SecureStorageService.saveAuthToken(res.access_token);
+      SecureStorageService.saveAuthToken(res.access_token);
       if (res.user) {
-        await SecureStorageService.saveUserData(res.user);
+        SecureStorageService.saveUserData(res.user);
       }
       if (res.subscription) {
-        await SecureStorageService.saveSubscription(res.subscription);
+        SecureStorageService.saveSubscription(res.subscription);
       }
 
       setAuthenticated(true);

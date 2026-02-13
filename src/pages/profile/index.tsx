@@ -30,11 +30,11 @@ export const ProfileScreen: React.FC = () => {
   const [form, setForm] = useState({ oldPassword: '', newPassword: '' });
 
   useEffect(() => {
-    const loadUser = async () => {
-      const storedUser = await SecureStorageService.getUserData();
+    const loadUser = () => {
+      const storedUser = SecureStorageService.getUserData();
       if (storedUser) setUser(storedUser);
     };
-    void loadUser();
+    loadUser();
   }, []);
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -76,7 +76,7 @@ export const ProfileScreen: React.FC = () => {
     if (confirmToDelete) {
       try {
         await deleteAccount(userId);
-        await SecureStorageService.clearAll();
+        SecureStorageService.clearAll();
         setAuthenticated(false);
         navigate('/registration');
         alert('Ваш аккаунт был удалён.');
@@ -91,7 +91,7 @@ export const ProfileScreen: React.FC = () => {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      await SecureStorageService.clearAll();
+      SecureStorageService.clearAll();
       setAuthenticated(false);
       navigate('/login');
     } catch (error) {

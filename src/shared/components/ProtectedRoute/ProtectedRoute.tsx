@@ -11,20 +11,15 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = await SecureStorageService.getAuthToken();
-
-        setIsAuthenticated(!!token);
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setIsAuthenticated(false);
-      } finally {
-        setIsChecking(false);
-      }
-    };
-
-    checkAuth();
+    try {
+      const token = SecureStorageService.getAuthToken();
+      setIsAuthenticated(!!token);
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setIsAuthenticated(false);
+    } finally {
+      setIsChecking(false);
+    }
   }, []);
 
   if (isChecking) {

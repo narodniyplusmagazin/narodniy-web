@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -60,17 +61,14 @@ export const HomeScreen: React.FC = () => {
   ];
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const authenticated = await SecureStorageService.isAuthenticated();
-        setIsAuthenticated(authenticated);
-      } catch (error) {
-        console.error('Auth check error:', error);
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    try {
+      const authenticated = SecureStorageService.isAuthenticated();
+      setIsAuthenticated(authenticated);
+    } catch (error) {
+      console.error('Auth check error:', error);
+      setIsAuthenticated(false);
+    }
 
     // Trigger animation on mount
     // eslint-disable-next-line react-hooks/set-state-in-effect

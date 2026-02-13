@@ -38,7 +38,7 @@ export const useSubscriptionScreen = () => {
 
   const loadUserData = async () => {
     try {
-      const data = await SecureStorageService.getUserData();
+      const data = SecureStorageService.getUserData();
       setUserData(data);
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -59,7 +59,7 @@ export const useSubscriptionScreen = () => {
 
   const loadActiveSubscription = async () => {
     try {
-      const userData = await SecureStorageService.getUserData();
+      const userData = SecureStorageService.getUserData();
       if (!userData?.id) return;
 
       const subscriptions = await getMySubscriptions(userData.id);
@@ -71,12 +71,12 @@ export const useSubscriptionScreen = () => {
 
       if (active) {
         setActiveSubscription(active);
-        await SecureStorageService.saveSubscription(active);
+        SecureStorageService.saveSubscription(active);
       }
     } catch (error) {
       console.error('Ошибка загрузки подписки:', error);
       try {
-        const subscription = await SecureStorageService.getSubscription();
+        const subscription = SecureStorageService.getSubscription();
         if (subscription && new Date(subscription.endDate) > new Date()) {
           setActiveSubscription(subscription);
         }
@@ -105,14 +105,14 @@ export const useSubscriptionScreen = () => {
 
     try {
       setSubscribing(true);
-      const userData = await SecureStorageService.getUserData();
+      const userData = SecureStorageService.getUserData();
       if (!userData?.id) {
         alert('Ошибка\nНе удалось получить данные пользователя');
         return;
       }
 
       const subscriptionData = await createSubscription(userData.id);
-      await SecureStorageService.saveSubscription(subscriptionData);
+      SecureStorageService.saveSubscription(subscriptionData);
 
       try {
         await generateQR(subscriptionData.id, userData.id);
@@ -147,14 +147,14 @@ export const useSubscriptionScreen = () => {
 
     try {
       setSubscribing(true);
-      const userData = await SecureStorageService.getUserData();
+      const userData = SecureStorageService.getUserData();
       if (!userData?.id) {
         alert('Ошибка\nНе удалось получить данные пользователя');
         return;
       }
 
       const subscriptionData = await createSubscription(userData.id);
-      await SecureStorageService.saveSubscription(subscriptionData);
+      SecureStorageService.saveSubscription(subscriptionData);
 
       try {
         await generateQR(subscriptionData.id, userData.id);
