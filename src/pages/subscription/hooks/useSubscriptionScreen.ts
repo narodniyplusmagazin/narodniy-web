@@ -122,7 +122,7 @@ export const useSubscriptionScreen = () => {
 
       alert('Успех\nПодписка успешно оформлена!');
       // window.location.href = '/qrPage';
-      navigate('/qrPage');
+      navigate('/scan');
     } catch (error) {
       console.log(error, 'Ошибка оформления подписки');
     } finally {
@@ -164,7 +164,7 @@ export const useSubscriptionScreen = () => {
 
       alert('Успех\nТестовая подписка создана!');
       // window.location.href = '/qrPage';
-      navigate('/qrPage');
+      navigate('/scan');
     } catch (error) {
       console.log(error, 'Ошибка создания тестовой подписки');
     } finally {

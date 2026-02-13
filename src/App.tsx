@@ -18,7 +18,7 @@ function App() {
         <Route path="/registration" element={<RegistrationScreen />} />
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyScreen />} />
-        <Route path="/qrPage" element={<QRScreen />} />
+        <Route path="/scan" element={<QRScreen />} />
         <Route
           path="/profile"
           element={
