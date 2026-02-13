@@ -15,23 +15,13 @@ export type UserDataType = {
 };
 
 /**
- * Advanced SecureStorageService using IndexedDB
+ * SecureStorageService using localStorage
  *
- * Advantages over localStorage:
- * - Larger storage capacity (typically 50MB+)
- * - Asynchronous API (doesn't block main thread)
- * - Better for storing complex data structures
- * - Isolated per domain (better security)
- * - Supports indexing and queries
+ * Simple and straightforward storage for authentication and user data
  *
- * Usage: Use this for production applications requiring enhanced security
+ * Usage: Use this for storing auth tokens, user data, and subscription info
  */
 export class SecureStorageService {
-  private static readonly DB_NAME = 'secure_storage';
-  private static readonly DB_VERSION = 1;
-  private static readonly STORE_NAME = 'data';
-  private static db: IDBDatabase | null = null;
-
   private static readonly KEYS = {
     AUTH_TOKEN: 'auth_token',
     USER_ID: 'user_id',
@@ -42,125 +32,71 @@ export class SecureStorageService {
   };
 
   /**
-   * Initialize IndexedDB
+   * Check if localStorage is available
    */
-  private static async initDB(): Promise<IDBDatabase> {
-    if (this.db) {
-      return this.db;
-    }
-
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
-
-      request.onerror = () => {
-        reject(new Error('Failed to open IndexedDB'));
-      };
-
-      request.onsuccess = () => {
-        this.db = request.result;
-        resolve(this.db);
-      };
-
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        if (!db.objectStoreNames.contains(this.STORE_NAME)) {
-          db.createObjectStore(this.STORE_NAME);
-        }
-      };
-    });
-  }
-
-  /**
-   * Check if IndexedDB is available
-   */
-  private static isIndexedDBAvailable(): boolean {
+  private static isLocalStorageAvailable(): boolean {
     try {
-      return typeof indexedDB !== 'undefined';
+      return typeof localStorage !== 'undefined';
     } catch {
       return false;
     }
   }
 
   /**
-   * Save data to IndexedDB
+   * Save data to localStorage
    */
-  private static async setData(key: string, value: any): Promise<boolean> {
+  private static setData(key: string, value: any): boolean {
     try {
-      if (!this.isIndexedDBAvailable()) {
-        throw new Error('IndexedDB is not available');
+      if (!this.isLocalStorageAvailable()) {
+        throw new Error('localStorage is not available');
       }
 
-      const db = await this.initDB();
-      const transaction = db.transaction([this.STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(this.STORE_NAME);
+      const dataToStore = {
+        value,
+        timestamp: Date.now(),
+      };
 
-      return new Promise((resolve, reject) => {
-        const request = store.put(
-          {
-            value,
-            timestamp: Date.now(),
-          },
-          key
-        );
-
-        request.onsuccess = () => resolve(true);
-        request.onerror = () => reject(new Error('Failed to save data'));
-      });
+      localStorage.setItem(key, JSON.stringify(dataToStore));
+      return true;
     } catch (error) {
-      console.error('Error saving data to IndexedDB:', error);
+      console.error('Error saving data to localStorage:', error);
       return false;
     }
   }
 
   /**
-   * Get data from IndexedDB
+   * Get data from localStorage
    */
-  private static async getData(key: string): Promise<any | null> {
+  private static getData(key: string): any | null {
     try {
-      if (!this.isIndexedDBAvailable()) {
+      if (!this.isLocalStorageAvailable()) {
         return null;
       }
 
-      const db = await this.initDB();
-      const transaction = db.transaction([this.STORE_NAME], 'readonly');
-      const store = transaction.objectStore(this.STORE_NAME);
+      const stored = localStorage.getItem(key);
+      if (!stored) return null;
 
-      return new Promise((resolve, reject) => {
-        const request = store.get(key);
-
-        request.onsuccess = () => {
-          resolve(request.result?.value || null);
-        };
-
-        request.onerror = () => reject(new Error('Failed to get data'));
-      });
+      const parsed = JSON.parse(stored);
+      return parsed?.value || null;
     } catch (error) {
-      console.error('Error getting data from IndexedDB:', error);
+      console.error('Error getting data from localStorage:', error);
       return null;
     }
   }
 
   /**
-   * Delete data from IndexedDB
+   * Delete data from localStorage
    */
-  private static async deleteData(key: string): Promise<boolean> {
+  private static deleteData(key: string): boolean {
     try {
-      if (!this.isIndexedDBAvailable()) {
+      if (!this.isLocalStorageAvailable()) {
         return false;
       }
 
-      const db = await this.initDB();
-      const transaction = db.transaction([this.STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(this.STORE_NAME);
-
-      return new Promise((resolve, reject) => {
-        const request = store.delete(key);
-
-        request.onsuccess = () => resolve(true);
-        request.onerror = () => reject(new Error('Failed to delete data'));
-      });
+      localStorage.removeItem(key);
+      return true;
     } catch (error) {
-      console.error('Error deleting data from IndexedDB:', error);
+      console.error('Error deleting data from localStorage:', error);
       return false;
     }
   }
@@ -168,9 +104,9 @@ export class SecureStorageService {
   /**
    * Save authentication token
    */
-  static async saveAuthToken(token: any): Promise<boolean> {
+  static saveAuthToken(token: any): boolean {
     try {
-      return await this.setData(this.KEYS.AUTH_TOKEN, token);
+      return this.setData(this.KEYS.AUTH_TOKEN, token);
     } catch (error) {
       console.error('Error saving auth token:', error);
       return false;
@@ -180,9 +116,9 @@ export class SecureStorageService {
   /**
    * Get authentication token
    */
-  static async getAuthToken(): Promise<string | null> {
+  static getAuthToken(): string | null {
     try {
-      return await this.getData(this.KEYS.AUTH_TOKEN);
+      return this.getData(this.KEYS.AUTH_TOKEN);
     } catch (error) {
       console.error('Error getting auth token:', error);
       return null;
@@ -192,9 +128,9 @@ export class SecureStorageService {
   /**
    * Remove authentication token (logout)
    */
-  static async removeAuthToken(): Promise<boolean> {
+  static removeAuthToken(): boolean {
     try {
-      return await this.deleteData(this.KEYS.AUTH_TOKEN);
+      return this.deleteData(this.KEYS.AUTH_TOKEN);
     } catch (error) {
       console.error('Error removing auth token:', error);
       return false;
@@ -204,9 +140,9 @@ export class SecureStorageService {
   /**
    * Save user data
    */
-  static async saveUserData(userData: UserDataType): Promise<boolean> {
+  static saveUserData(userData: UserDataType): boolean {
     try {
-      return await this.setData(this.KEYS.USER_DATA, userData);
+      return this.setData(this.KEYS.USER_DATA, userData);
     } catch (error) {
       console.error('Error saving user data:', error);
       return false;
@@ -216,9 +152,9 @@ export class SecureStorageService {
   /**
    * Get user data
    */
-  static async getUserData(): Promise<UserDataType | null> {
+  static getUserData(): UserDataType | null {
     try {
-      return await this.getData(this.KEYS.USER_DATA);
+      return this.getData(this.KEYS.USER_DATA);
     } catch (error) {
       console.error('Error getting user data:', error);
       return null;
@@ -228,9 +164,9 @@ export class SecureStorageService {
   /**
    * Save subscription data
    */
-  static async saveSubscription(subscriptionData: any): Promise<boolean> {
+  static saveSubscription(subscriptionData: any): boolean {
     try {
-      return await this.setData(this.KEYS.SUBSCRIPTION_DATA, subscriptionData);
+      return this.setData(this.KEYS.SUBSCRIPTION_DATA, subscriptionData);
     } catch (error) {
       console.error('Error saving subscription:', error);
       return false;
@@ -240,9 +176,9 @@ export class SecureStorageService {
   /**
    * Get subscription data
    */
-  static async getSubscription(): Promise<any | null> {
+  static getSubscription(): any | null {
     try {
-      const data = await this.getData(this.KEYS.SUBSCRIPTION_DATA);
+      const data = this.getData(this.KEYS.SUBSCRIPTION_DATA);
       if (!data) return null;
 
       // Return nested subscription object if it exists, otherwise return the data itself
@@ -256,9 +192,9 @@ export class SecureStorageService {
   /**
    * Check if user is authenticated
    */
-  static async isAuthenticated(): Promise<boolean> {
+  static isAuthenticated(): boolean {
     try {
-      const token = await this.getAuthToken();
+      const token = this.getAuthToken();
       return token !== null;
     } catch {
       return false;
@@ -268,31 +204,18 @@ export class SecureStorageService {
   /**
    * Clear all stored data (logout)
    */
-  static async clearAll(): Promise<boolean> {
+  static clearAll(): boolean {
     try {
-      if (!this.isIndexedDBAvailable()) {
+      if (!this.isLocalStorageAvailable()) {
         return false;
       }
 
-      const db = await this.initDB();
-      const transaction = db.transaction([this.STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(this.STORE_NAME);
-
       const keysToDelete = Object.values(this.KEYS);
-
-      return new Promise((resolve) => {
-        let completed = 0;
-
-        keysToDelete.forEach((key) => {
-          const request = store.delete(key);
-          request.onsuccess = () => {
-            completed++;
-            if (completed === keysToDelete.length) {
-              resolve(true);
-            }
-          };
-        });
+      keysToDelete.forEach((key) => {
+        localStorage.removeItem(key);
       });
+
+      return true;
     } catch (error) {
       console.error('Error clearing data:', error);
       return false;
@@ -302,11 +225,11 @@ export class SecureStorageService {
   /**
    * Save with custom options (supports expiration)
    */
-  static async saveWithOptions(
+  static saveWithOptions(
     key: string,
     value: string,
     options?: { expiresIn?: number; [key: string]: any }
-  ): Promise<boolean> {
+  ): boolean {
     try {
       const data = {
         value,
@@ -315,7 +238,7 @@ export class SecureStorageService {
           : undefined,
       };
 
-      return await this.setData(key, data);
+      return this.setData(key, data);
     } catch (error) {
       console.error('Error saving with options:', error);
       return false;
@@ -325,14 +248,14 @@ export class SecureStorageService {
   /**
    * Get item by custom key
    */
-  static async getItem(key: string): Promise<string | null> {
+  static getItem(key: string): string | null {
     try {
-      const data = await this.getData(key);
+      const data = this.getData(key);
       if (!data) return null;
 
       // Check expiration if present
       if (data.expiresAt && data.expiresAt < Date.now()) {
-        await this.deleteData(key);
+        this.deleteData(key);
         return null;
       }
 
@@ -346,22 +269,12 @@ export class SecureStorageService {
   /**
    * Remove item by custom key
    */
-  static async removeItem(key: string): Promise<boolean> {
+  static removeItem(key: string): boolean {
     try {
-      return await this.deleteData(key);
+      return this.deleteData(key);
     } catch (error) {
       console.error('Error removing item:', error);
       return false;
-    }
-  }
-
-  /**
-   * Close the database connection
-   */
-  static closeDatabase(): void {
-    if (this.db) {
-      this.db.close();
-      this.db = null;
     }
   }
 }
