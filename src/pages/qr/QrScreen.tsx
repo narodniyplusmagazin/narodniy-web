@@ -101,13 +101,15 @@ export function QRScreen() {
 
             {usageStats && (
               <AvailableUsagesCard
-                usagesToday={usageStats.usagesToday}
+                usagesToday={usageStats.history.length}
                 maxUsagesPerDay={usageStats.maxUsagesPerDay}
                 remainingUses={usageStats.remainingUses}
               />
             )}
 
-            {qrVisible ? (
+            {usageStats?.history &&
+            usageStats?.history.length < 3 &&
+            qrVisible ? (
               <div className="qr-progress-container">
                 <div className="qr-progress-bar-bg">
                   <div
@@ -120,14 +122,16 @@ export function QRScreen() {
                 </div>
 
                 <div className="qr-card-wrapper">
-                  <QRCodeCard
-                    qrData={qrData}
-                    daysLeft={daysLeft}
-                    loading={loading}
-                    onRefreshQR={handleRefreshQR}
-                    onRenewPress={() => router('/subscription')}
-                    onOpenFullscreen={() => setShowQRFullscreen(true)}
-                  />
+                  {usageStats?.history && usageStats?.history.length < 3 && (
+                    <QRCodeCard
+                      qrData={qrData}
+                      daysLeft={daysLeft}
+                      loading={loading}
+                      onRefreshQR={handleRefreshQR}
+                      onRenewPress={() => router('/subscription')}
+                      onOpenFullscreen={() => setShowQRFullscreen(true)}
+                    />
+                  )}
                 </div>
 
                 <div className="qr-time-badge">

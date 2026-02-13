@@ -10,9 +10,9 @@ interface AvailableUsagesCardProps {
 
 export const AvailableUsagesCard: React.FC<AvailableUsagesCardProps> = ({
   maxUsagesPerDay,
-  remainingUses,
+  usagesToday,
 }) => {
-  const remainingUsages = Math.max(0, remainingUses);
+  const remainingUsages = Math.max(0, maxUsagesPerDay - usagesToday);
   const usedCount = maxUsagesPerDay - remainingUsages;
   const usagePercentage = (usedCount / maxUsagesPerDay) * 100;
 
