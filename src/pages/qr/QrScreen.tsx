@@ -8,7 +8,7 @@ import { SubscriptionStatusCard } from './components/SubscriptionStatusCard/Subs
 import { AvailableUsagesCard } from './components/AvailableUsagesCard/AvailableUsagesCard';
 import { QRCodeCard } from './components/QRCodeCard/QRCodeCard';
 
-export default function QRScreen() {
+export function QRScreen() {
   const router = useNavigate();
   const [progressValue, setProgressValue] = useState(0);
 

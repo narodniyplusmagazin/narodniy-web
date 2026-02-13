@@ -5,7 +5,7 @@ import { RegistrationScreen } from './pages/registration';
 import { LoginScreen } from './pages/login';
 import { ProfileScreen } from './pages/profile';
 import { SubscriptionScreen } from './pages/subscription';
-import QRScreen from './pages/qr/QrScreen';
+import { QRScreen } from './pages/qr/QrScreen';
 import { PrivacyPolicyScreen } from './pages/privacy-policy';
 import { ProtectedRoute } from './shared/components/ProtectedRoute';
 import { BottomNavigation } from './shared/components/BottomNavigation';
@@ -18,6 +18,7 @@ function App() {
         <Route path="/registration" element={<RegistrationScreen />} />
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyScreen />} />
+        <Route path="/qrPage" element={<QRScreen />} />
         <Route
           path="/profile"
           element={
@@ -31,14 +32,6 @@ function App() {
           element={
             <ProtectedRoute>
               <SubscriptionScreen />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/qrPage"
-          element={
-            <ProtectedRoute>
-              <QRScreen />
             </ProtectedRoute>
           }
         />
