@@ -20,11 +20,6 @@ export const createSubscription = async (userId: string) => {
   return res.data;
 };
 
-export const testCreateSubscription = async (userId: string) => {
-  const res = await api.post(`/subscriptions/create`, { userId });
-  return res.data;
-};
-
 export const getSubscriptionPlan = async () => {
   const res = await api.get<SubscriptionType>(`/subscriptions/plan`);
   return res.data;

@@ -2,46 +2,5 @@
   "name": "Narodniy+ Loyalty Program",
   "short_name": "Narodniy+",
   "description": "Subscription-based QR code loyalty program with exclusive benefits",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4A90E2",
-  "orientation": "portrait-primary",
-  "icons": [],
-  "categories": ["lifestyle", "shopping"],
-  "screenshots": [
-    {
-      "src": "/screenshots/home.png",
-      "sizes": "540x720",
-      "type": "image/png"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "My QR Code",
-      "short_name": "QR",
-      "description": "View your active QR code",
-      "url": "/qr",
-      "icons": [
-        {
-          "src": "/icons/qr-shortcut.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Subscription",
-      "short_name": "Subscribe",
-      "description": "Manage your subscription",
-      "url": "/subscription",
-      "icons": [
-        {
-          "src": "/icons/subscription-shortcut.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    }
-  ]
+  "start_url": "/"
 }
