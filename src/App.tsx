@@ -35,7 +35,7 @@ function App() {
           }
         />
         <Route
-          path="/qr"
+          path="/qrPage"
           element={
             <ProtectedRoute>
               <QRScreen />

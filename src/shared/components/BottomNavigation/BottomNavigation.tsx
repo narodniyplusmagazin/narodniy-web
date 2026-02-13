@@ -32,7 +32,7 @@ export const BottomNavigation = () => {
 
   const protectedNavItems = [
     { path: '/', icon: Home, label: 'Главная' },
-    { path: '/qr', icon: QrCode, label: 'QR Код' },
+    { path: '/qrPage', icon: QrCode, label: 'QR Код' },
     { path: '/subscription', icon: CreditCard, label: 'Подписка' },
     { path: '/profile', icon: User, label: 'Профиль' },
   ];

@@ -39,7 +39,7 @@ export const HomeScreen: React.FC = () => {
       title: 'QR Код 123',
       icon: <QrCode size={32} color="white" />,
       description: 'Мой QR код для скидок',
-      route: '/qr',
+      route: '/qrPage',
       color: colors.primary,
     },
     {

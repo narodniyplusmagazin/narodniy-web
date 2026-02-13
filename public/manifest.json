@@ -1,6 +1,6 @@
 {
-  "name": "Narodniy+ Loyalty Program",
+  "name": "Narodniy+",
   "short_name": "Narodniy+",
-  "description": "Subscription-based QR code loyalty program with exclusive benefits",
+  "description": "Программа лояльности на основе подписки с QR-кодом и эксклюзивными преимуществами.",
   "start_url": "/"
 }

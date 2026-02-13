@@ -214,7 +214,7 @@ export const ProfileScreen: React.FC = () => {
 
             <button
               className="action-card"
-              onClick={() => navigate('/qr')}
+              onClick={() => navigate('/qrPage')}
               type="button"
             >
               <div className="action-icon">
