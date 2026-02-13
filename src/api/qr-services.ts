@@ -37,7 +37,7 @@ export const generateQR = async (
   subscriptionId: string,
   userId: string
 ): Promise<QRGenerateResponse> => {
-  const response = await api.post(`qr/generate`, {
+  const response = await api.post(`qr-code/generate`, {
     userId,
     subscriptionId,
   });
@@ -51,7 +51,7 @@ export const getTodayToken = async (
 ): Promise<QRTodayTokenResponse> => {
   console.log(subscriptionId);
 
-  const response = await api.get(`qr/today/${subscriptionId}`);
+  const response = await api.get(`qr-code/today/${subscriptionId}`);
 
   return response.data;
 };
@@ -66,7 +66,7 @@ export const getTodayToken = async (
 export const getQrUsages = async (
   subscriptionId: string
 ): Promise<QRUsageStats> => {
-  const response = await api.get(`qr/usages/${subscriptionId}`);
+  const response = await api.get(`qr-code/usages/${subscriptionId}`);
 
   return response.data;
 };
