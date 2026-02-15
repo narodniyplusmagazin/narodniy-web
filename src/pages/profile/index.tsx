@@ -277,14 +277,14 @@ export const ProfileScreen: React.FC = () => {
               <span className="logout-text">Выйти из аккаунта</span>
             </button>
 
-            <button
+            {/* <button
               className="delete-button"
               onClick={() => handleDeleteAccount(user?.id as string)}
               type="button"
             >
               <Trash2 size={24} className="delete-icon" />
               <span className="delete-text">Удалить аккаунт</span>
-            </button>
+            </button> */}
           </div>
         </section>
 
