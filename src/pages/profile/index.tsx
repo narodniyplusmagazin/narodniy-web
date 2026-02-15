@@ -10,7 +10,6 @@ import {
   QrCode,
   Settings,
   LogOut,
-  Trash2,
   Zap,
 } from 'lucide-react';
 
@@ -20,7 +19,7 @@ import {
   type UserDataType,
 } from '../../services/secure-storage-service';
 import { useAuthStore } from '../../shared/stores/auth-store';
-import { deleteAccount, resetPassword } from '../../api/auth-api';
+import {  resetPassword } from '../../api/auth-api';
 
 export const ProfileScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -66,27 +65,27 @@ export const ProfileScreen: React.FC = () => {
     }
   };
 
-  const handleDeleteAccount = async (userId: string) => {
-    if (!user?.id) return;
+  // const handleDeleteAccount = async (userId: string) => {
+  //   if (!user?.id) return;
 
-    const confirmToDelete = confirm(
-      'Подтверждение: Вы уверены, что хотите удалить свой аккаунт? Это действие необратимо.'
-    );
+  //   const confirmToDelete = confirm(
+  //     'Подтверждение: Вы уверены, что хотите удалить свой аккаунт? Это действие необратимо.'
+  //   );
 
-    if (confirmToDelete) {
-      try {
-        await deleteAccount(userId);
-        SecureStorageService.clearAll();
-        setAuthenticated(false);
-        navigate('/registration');
-        alert('Ваш аккаунт был удалён.');
-      } catch (error) {
-        console.log(error, 'Ошибка удаления аккаунта');
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
+  //   if (confirmToDelete) {
+  //     try {
+  //       await deleteAccount(userId);
+  //       SecureStorageService.clearAll();
+  //       setAuthenticated(false);
+  //       navigate('/registration');
+  //       alert('Ваш аккаунт был удалён.');
+  //     } catch (error) {
+  //       console.log(error, 'Ошибка удаления аккаунта');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  // };
 
   const handleLogout = async () => {
     setLoading(true);
