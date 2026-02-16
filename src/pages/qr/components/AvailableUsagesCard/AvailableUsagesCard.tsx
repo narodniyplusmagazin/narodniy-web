@@ -10,15 +10,16 @@ interface AvailableUsagesCardProps {
 
 export const AvailableUsagesCard: React.FC<AvailableUsagesCardProps> = ({
   maxUsagesPerDay,
-  usagesToday,
+  // usagesToday,
+  remainingUses,
 }) => {
-  const remainingUsages = Math.max(0, maxUsagesPerDay - usagesToday);
-  const usedCount = maxUsagesPerDay - remainingUsages;
+  // const remainingUsages = Math.max(0, maxUsagesPerDay - usagesToday);
+  const usedCount = maxUsagesPerDay - remainingUses;
   const usagePercentage = (usedCount / maxUsagesPerDay) * 100;
 
   const getStatusColor = () => {
-    if (remainingUsages === 0) return 'tomato';
-    if (remainingUsages === 1) return 'orange';
+    if (remainingUses === 0) return 'tomato';
+    if (remainingUses === 1) return 'orange';
     return 'green';
   };
 
@@ -64,14 +65,14 @@ export const AvailableUsagesCard: React.FC<AvailableUsagesCardProps> = ({
           />
         </div>
 
-        {remainingUsages === 0 ? (
+        {remainingUses === 0 ? (
           <p
             className="available-usages-message"
             style={{ color: 'var(--error)' }}
           >
             ❌ Лимит использования исчерпан на сегодня
           </p>
-        ) : remainingUsages === 1 ? (
+        ) : remainingUses === 1 ? (
           <p
             className="available-usages-message"
             style={{ color: 'var(--warning)' }}
@@ -83,8 +84,8 @@ export const AvailableUsagesCard: React.FC<AvailableUsagesCardProps> = ({
             className="available-usages-message"
             style={{ color: 'var(--success)' }}
           >
-            ✓ У вас есть {remainingUsages}{' '}
-            {remainingUsages === 2 ? 'входа' : 'входов'} на сегодня
+            ✓ У вас есть {remainingUses}{' '}
+            {remainingUses === 2 ? 'входа' : 'входов'} на сегодня
           </p>
         )}
       </div>

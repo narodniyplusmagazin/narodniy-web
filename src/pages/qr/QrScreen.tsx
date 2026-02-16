@@ -75,6 +75,9 @@ export function QRScreen() {
 
   const progressWidth = () => `${progressValue * 100}%`;
 
+  console.log(usageStats);
+  
+
   return (
     <div className="qr-screen-container">
       <div className="qr-scroll-container">
@@ -107,8 +110,8 @@ export function QRScreen() {
               />
             )}
 
-            {usageStats?.history &&
-            usageStats?.history.length < 3 &&
+            {usageStats?.remainingUses &&
+            usageStats?.remainingUses < 3 &&
             qrVisible ? (
               <div className="qr-progress-container">
                 <div className="qr-progress-bar-bg">
@@ -122,7 +125,7 @@ export function QRScreen() {
                 </div>
 
                 <div className="qr-card-wrapper">
-                  {usageStats?.history && usageStats?.history.length < 3 && (
+                  {usageStats?.remainingUses && usageStats?.remainingUses < 3 && (
                     <QRCodeCard
                       qrData={qrData}
                       daysLeft={daysLeft}
