@@ -75,7 +75,7 @@ export function QRScreen() {
 
   const progressWidth = () => `${progressValue * 100}%`;
 
-  console.log(usageStats);
+  const hasNoAvailableUsages = usageStats?.avalibleUsageCount === 0;
   
 
   return (
@@ -107,14 +107,14 @@ export function QRScreen() {
                 usagesToday={usageStats.history.length}
                 maxUsagesPerDay={usageStats.maxUsagesPerDay}
                 remainingUses={usageStats.remainingUses}
+                hasNoAvailableUsages={hasNoAvailableUsages}
               />
             )}
 
-            {usageStats?.remainingUses &&
-            usageStats?.remainingUses < 3 &&
+            {
             qrVisible ? (
               <div className="qr-progress-container">
-                <div className="qr-progress-bar-bg">
+               { !hasNoAvailableUsages && <div className="qr-progress-bar-bg">
                   <div
                     className="qr-progress-bar"
                     style={{
@@ -122,10 +122,16 @@ export function QRScreen() {
                       backgroundColor: progressColor(),
                     }}
                   />
-                </div>
+                </div>}
 
                 <div className="qr-card-wrapper">
-                  {usageStats?.remainingUses && usageStats?.remainingUses < 3 && (
+                  {hasNoAvailableUsages ? (
+                    <div className="qr-show-container">
+                      <p className="qr-show-hint">
+                        Лимит использований на сегодня исчерпан. QR-код будет доступен завтра.
+                      </p>
+                    </div>
+                  ) : (
                     <QRCodeCard
                       qrData={qrData}
                       daysLeft={daysLeft}
@@ -134,12 +140,12 @@ export function QRScreen() {
                       onRenewPress={() => router('/subscription')}
                       onOpenFullscreen={() => setShowQRFullscreen(true)}
                     />
-                  )}
+                   )}
                 </div>
 
                 <div className="qr-time-badge">
                   <span className="qr-time-icon">⏱️</span>
-                  <span>Скроется через {qrCountdown} сек</span>
+                  {!hasNoAvailableUsages && <span>Скроется через {qrCountdown} сек</span>}
                 </div>
               </div>
             ) : (

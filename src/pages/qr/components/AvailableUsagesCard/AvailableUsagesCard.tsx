@@ -6,12 +6,14 @@ interface AvailableUsagesCardProps {
   usagesToday: number;
   maxUsagesPerDay: number;
   remainingUses: number;
+  hasNoAvailableUsages: boolean;
 }
 
 export const AvailableUsagesCard: React.FC<AvailableUsagesCardProps> = ({
   maxUsagesPerDay,
   // usagesToday,
   remainingUses,
+  hasNoAvailableUsages
 }) => {
   // const remainingUsages = Math.max(0, maxUsagesPerDay - usagesToday);
   const usedCount = maxUsagesPerDay - remainingUses;
@@ -55,7 +57,8 @@ export const AvailableUsagesCard: React.FC<AvailableUsagesCardProps> = ({
           ))}
         </div>
 
-        <div className="usage-progress-bar">
+        {!hasNoAvailableUsages &&
+          <div className="usage-progress-bar">
           <div
             className="usage-progress-fill"
             style={{
@@ -64,6 +67,7 @@ export const AvailableUsagesCard: React.FC<AvailableUsagesCardProps> = ({
             }}
           />
         </div>
+        }
 
         {remainingUses === 0 ? (
           <p

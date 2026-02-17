@@ -19,10 +19,13 @@ export interface QRTodayTokenResponse {
   usageCount: number;
   validFrom: string;
   validTo: string;
+  qrWithPrefix: string;
+  avalibleUsageCount: number;
 }
 
 // Response from GET /qr/usages/:subscriptionId
 export interface QRUsageStats {
+  avalibleUsageCount: number;
   usages: Array<{
     usedAt: string;
     location?: string;

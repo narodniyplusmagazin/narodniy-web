@@ -20,6 +20,7 @@ export interface QRData {
 }
 
 export interface UsageStats {
+  avalibleUsageCount: number;
   totalUsages: number;
   usagesToday: number;
   usagesThisWeek: number;
@@ -135,6 +136,7 @@ export const useQRScreen = () => {
           usagesThisMonth: usagesThisMonth,
           maxUsagesPerDay: apiStats.dailyLimit,
           remainingUses: apiStats.remainingUses,
+          avalibleUsageCount: apiStats.avalibleUsageCount,
           history: apiStats.usages,
         });
       } catch {
@@ -143,8 +145,9 @@ export const useQRScreen = () => {
           usagesToday: 0,
           usagesThisWeek: 0,
           usagesThisMonth: 0,
-          maxUsagesPerDay: subscription?.maxUsagesPerDay || 5,
-          remainingUses: subscription?.maxUsagesPerDay || 5,
+          maxUsagesPerDay: subscription?.maxUsagesPerDay || 3,
+          remainingUses: subscription?.maxUsagesPerDay || 3,
+          avalibleUsageCount: subscription?.maxUsagesPerDay || 3,
           history: [],
         });
       }
