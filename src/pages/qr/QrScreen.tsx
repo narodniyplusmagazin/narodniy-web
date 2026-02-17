@@ -125,13 +125,7 @@ export function QRScreen() {
                 </div>}
 
                 <div className="qr-card-wrapper">
-                  {hasNoAvailableUsages ? (
-                    <div className="qr-show-container">
-                      <p className="qr-show-hint">
-                        Лимит использований на сегодня исчерпан. QR-код будет доступен завтра.
-                      </p>
-                    </div>
-                  ) : (
+                 
                     <QRCodeCard
                       qrData={qrData}
                       daysLeft={daysLeft}
@@ -139,8 +133,9 @@ export function QRScreen() {
                       onRefreshQR={handleRefreshQR}
                       onRenewPress={() => router('/subscription')}
                       onOpenFullscreen={() => setShowQRFullscreen(true)}
+                      hasNoAvailableUsages={hasNoAvailableUsages}
                     />
-                   )}
+                   
                 </div>
 
                 <div className="qr-time-badge">

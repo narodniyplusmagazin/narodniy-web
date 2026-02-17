@@ -15,6 +15,7 @@ interface QRCodeCardProps {
   qrData: QRData | null;
   daysLeft: number;
   loading: boolean;
+  hasNoAvailableUsages?: boolean;
   onRefreshQR: () => void;
   onRenewPress: () => void;
   onOpenFullscreen: () => void;
@@ -23,9 +24,7 @@ interface QRCodeCardProps {
 export const QRCodeCard: FC<QRCodeCardProps> = ({
   qrData,
   daysLeft,
-  loading,
-  onRefreshQR,
-  onRenewPress,
+  hasNoAvailableUsages = false,
   onOpenFullscreen,
 }) => {
   useEffect(() => {
@@ -56,15 +55,24 @@ export const QRCodeCard: FC<QRCodeCardProps> = ({
 
   const qrValue = getQRValue();
 
+  if(hasNoAvailableUsages){
+    return (
+      <div className="qr-card no-usage">
+        <p className="qr-title">⚠️ Лимит использований на сегодня исчерпан</p>
+        <p className="qr-subtitle">QR-код будет доступен завтра</p>
+      </div>
+    );
+  }
+
   return (
     <div className="qr-card">
       <p className="qr-title">
         {daysLeft > 0 ? '🎫 Покажите QR-код на кассе' : '⚠️ Подписка истекла'}
       </p>
 
-      <div className="qr-gradient-wrapper">
+      {<div className="qr-gradient-wrapper">
         <div className="qr-wrapper" onClick={onOpenFullscreen}>
-          {qrValue ? (
+          {qrValue  ? (
             <QRCode value={qrValue} size={250} fgColor="#000" />
           ) : (
             <div className="qr-placeholder">
@@ -72,7 +80,7 @@ export const QRCodeCard: FC<QRCodeCardProps> = ({
             </div>
           )}
         </div>
-      </div>
+      </div>}
 
       {daysLeft > 0 ? (
         <>
@@ -89,18 +97,16 @@ export const QRCodeCard: FC<QRCodeCardProps> = ({
             )}
           </div>
 
-          <button
+          {/* <button
             className="refresh-button"
             onClick={onRefreshQR}
             disabled={loading}
           >
             Открыть QR-код
-          </button>
+          </button> */}
         </>
       ) : (
-        <button className="renew-button-inline" onClick={onRenewPress}>
-          ⭐ Продлить подписку
-        </button>
+        <></>
       )}
     </div>
   );
