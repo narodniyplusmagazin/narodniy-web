@@ -39,6 +39,7 @@ export type RegisterDto = {
   password: string;
   acceptTerms: boolean;
   code?: string;
+  deviceType: "web"; 
 };
 
 export const deleteAccount = async (id: string) => {

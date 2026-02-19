@@ -79,7 +79,7 @@ export const RegistrationScreen: React.FC = () => {
     }
 
     try {
-      const res = await registration(form);
+      const res = await registration({...form, deviceType: "web" });
 
       SecureStorageService.saveAuthToken(res.access_token);
       if (res.user) {
