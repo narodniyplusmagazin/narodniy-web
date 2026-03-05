@@ -28,6 +28,7 @@ export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isDisabled =
     !isActive || subscribing || hasActiveSubscription || paymentLoading;
 
@@ -73,13 +74,16 @@ export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
       </button> */}
 
       <button
-        className={`button ${isDisabled ? 'button-disabled' : ''}`}
+        // className={`button ${isDisabled ? 'button-disabled' : ''}`}
+        className={`button  button-disabled`}
         onClick={handleRealPayment}
-        disabled={isDisabled}
+        disabled={true}
+        // disabled={isDisabled}
       >
-        {hasActiveSubscription
+        Подписка временно недоступно 
+        {/* {hasActiveSubscription
           ? 'У вас уже есть подписку'
-          : 'Оформить подписку'}
+          : 'Оформить подписку'} */}
         {/* {paymentLoading ? 'Обработка...' : 'Оформить подписку '} */}
       </button>
 
