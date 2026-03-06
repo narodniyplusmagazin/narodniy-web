@@ -19,18 +19,26 @@ interface SubscriptionActionsProps {
 
 export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
   isActive,
-  subscribing,
+  // subscribing,
   hasActiveSubscription = false,
   userId,
   userEmail,
   userPhone,
+  userData,
 }) => {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const isDisabled =
-    !isActive || subscribing || hasActiveSubscription || paymentLoading;
+  // Check if user is NARODNIY
+  const isNarodniy = userData?.fullName?.toUpperCase() === 'NARODNIY';
+
+  // Determine button text
+  const getButtonText = () => {
+    if (!isNarodniy) return 'Подписка временно недоступно';
+    if (hasActiveSubscription) return 'У вас уже есть подписку';
+    if (paymentLoading) return 'Обработка...';
+    return 'Оформить подписку';
+  };
 
   const handleRealPayment = async () => {
     if (!userId || !userPhone) {
@@ -74,17 +82,11 @@ export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
       </button> */}
 
       <button
-        // className={`button ${isDisabled ? 'button-disabled' : ''}`}
-        className={`button  button-disabled`}
+        className={`button ${isNarodniy ? '' : 'button-disabled'}`}
         onClick={handleRealPayment}
-        disabled={true}
-        // disabled={isDisabled}
+        disabled={!isNarodniy}
       >
-        Подписка временно недоступно 
-        {/* {hasActiveSubscription
-          ? 'У вас уже есть подписку'
-          : 'Оформить подписку'} */}
-        {/* {paymentLoading ? 'Обработка...' : 'Оформить подписку '} */}
+        {getButtonText()}
       </button>
 
       {paymentError && (
