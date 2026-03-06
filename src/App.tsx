@@ -3,6 +3,7 @@ import './App.css';
 import { HomeScreen } from './pages/home/index';
 import { RegistrationScreen } from './pages/registration';
 import { LoginScreen } from './pages/login';
+import { ForgotPasswordScreen } from './pages/forgot-password';
 import { ProfileScreen } from './pages/profile';
 import { SubscriptionScreen } from './pages/subscription';
 import { QRScreen } from './pages/qr/QrScreen';
@@ -17,6 +18,7 @@ function App() {
         <Route path="/" element={<HomeScreen />} />
         <Route path="/registration" element={<RegistrationScreen />} />
         <Route path="/login" element={<LoginScreen />} />
+        <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyScreen />} />
         <Route path="/scan" element={<QRScreen />} />
         <Route
