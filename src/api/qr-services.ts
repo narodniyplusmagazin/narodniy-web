@@ -51,33 +51,26 @@ export interface QRUsageStats {
 
 /**
  * POST /qr-code/generate
- * Generates a new daily QR code (valid for 30 seconds display)
+ * Generates a fresh QR code each time for security.
+ * Each QR code is valid for 30 seconds display on frontend.
+ * Backend token remains valid longer (e.g., 3 hours).
+ * 
+ * @param userId - User ID
+ * @param subscriptionId - Subscription ID
+ * @returns QR code data including token and expiry
  */
 export const generateQRCode = async (
   userId: string,
   subscriptionId: string
 ): Promise<QRGenerateResponse> => {
+  console.log('🆕 Generating QR for userId:', userId, 'subscriptionId:', subscriptionId);
+  
   const response = await api.post('qr-code/generate', {
     userId,
     subscriptionId,
   });
-  return response.data;
-};
-
-/**
- * POST /qr-code/regenerate
- * Regenerates a new QR code (doesn't affect daily usage)
- */
-export const regenerateQRCode = async (
-  userId: string,
-  subscriptionId: string
-): Promise<QRGenerateResponse> => {
-  console.log(subscriptionId);
   
-  const response = await api.post('qr-code/regenerate-session', {
-    userId,
-    // subscriptionId,
-  });
+  console.log('🆕 Generate Response:', response.data);
   return response.data;
 };
 

@@ -31,6 +31,10 @@ export const QRCodeCard: FC<QRCodeCardProps> = ({
 }) => {
   useEffect(() => {
     if (qrData) {
+      console.log('🎯 QRCodeCard received qrData:', qrData);
+      console.log('🎯 qrData.qrCode:', qrData.qrCode);
+      console.log('🎯 qrData.qrCode type:', typeof qrData.qrCode);
+      
       if (typeof qrData.qrCode === 'object') {
         console.error('❌ QR code is an object, not a string!');
       }
@@ -38,7 +42,10 @@ export const QRCodeCard: FC<QRCodeCardProps> = ({
   }, [qrData]);
 
   const getQRValue = () => {
-    if (!qrData?.qrCode) return '';
+    if (!qrData?.qrCode) {
+      console.warn('⚠️ No qrData.qrCode available');
+      return '';
+    }
 
     if (typeof qrData.qrCode === 'object') {
       console.warn('Converting object to string for QR code');
@@ -54,6 +61,7 @@ export const QRCodeCard: FC<QRCodeCardProps> = ({
   };
 
   const qrValue = getQRValue();
+  console.log('🎯 Final qrValue:', qrValue);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {

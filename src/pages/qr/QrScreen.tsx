@@ -89,6 +89,15 @@ export function QRScreen() {
     );
   }
 
+  console.log('🔍 QR Screen State:', {
+    qrData: qrData,
+    qrVisible,
+    isGenerating,
+    loading,
+    hasNoAvailableUsages,
+    qrDataExists: !!qrData,
+    qrCodeValue: qrData?.qrCode
+  });
   console.log(qrData?.qrToken, "qr token");
   console.log(qrData?.qrCode, "qr code");
   
