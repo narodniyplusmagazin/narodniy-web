@@ -110,12 +110,20 @@ export const QRCodeCard: FC<QRCodeCardProps> = ({
           <p className="qr-info-text">🔒 Не передавайте код третьим лицам</p>
           <p className="qr-info-text">⚡ Действителен 30 секунд</p>
 
-          {qrData && (
+          {qrData?.expiresAt && (
             <p className="qr-expiry">
               Истекает в:{' '}
-              {format(new Date(qrData.expiresAt), 'HH:mm:ss', {
-                locale: ru,
-              })}
+              {(() => {
+                try {
+                  const expiryDate = new Date(qrData.expiresAt);
+                  if (isNaN(expiryDate.getTime())) {
+                    return 'Скоро';
+                  }
+                  return format(expiryDate, 'HH:mm:ss', { locale: ru });
+                } catch {
+                  return 'Скоро';
+                }
+              })()}
             </p>
           )}
         </div>

@@ -50,14 +50,28 @@ export const SubscriptionStatusCard: FC<SubscriptionStatusCardProps> = ({
         <div className="date-item">
           <span className="date-label">Начало</span>
           <span className="date-value">
-            {format(new Date(startDate), 'dd.MM.yyyy', { locale: ru })}
+            {(() => {
+              try {
+                const date = new Date(startDate);
+                return isNaN(date.getTime()) ? '-' : format(date, 'dd.MM.yyyy', { locale: ru });
+              } catch {
+                return '-';
+              }
+            })()}
           </span>
         </div>
         <div className="date-separator" />
         <div className="date-item">
           <span className="date-label">Окончание</span>
           <span className="date-value">
-            {format(new Date(endDate), 'dd.MM.yyyy', { locale: ru })}
+            {(() => {
+              try {
+                const date = new Date(endDate);
+                return isNaN(date.getTime()) ? '-' : format(date, 'dd.MM.yyyy', { locale: ru });
+              } catch {
+                return '-';
+              }
+            })()}
           </span>
         </div>
       </div>

@@ -72,9 +72,16 @@ export const UsageStatsCard: FC<UsageStatsCardProps> = ({
           {stats.history.slice(0, 5).map((item, index) => (
             <div key={index} className="history-item">
               <span className="history-date">
-                {format(new Date(item.usedAt), 'dd.MM.yyyy HH:mm', {
-                  locale: ru,
-                })}
+                {(() => {
+                  try {
+                    const date = new Date(item.usedAt);
+                    return isNaN(date.getTime())
+                      ? '-'
+                      : format(date, 'dd.MM.yyyy HH:mm', { locale: ru });
+                  } catch {
+                    return '-';
+                  }
+                })()}
               </span>
               {item.location && (
                 <span className="history-location">📍 {item.location}</span>
