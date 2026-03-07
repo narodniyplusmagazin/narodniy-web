@@ -40,7 +40,7 @@ export function QRScreen() {
   useEffect(() => {
     if (qrVisible && qrCountdown > 0) {
       setProgressValue(0);
-      const duration = 30000; // 30 seconds
+      const duration = 3000; // 30 seconds
       const start = Date.now();
       let frameId: number;
 
