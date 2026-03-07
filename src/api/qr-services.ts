@@ -51,7 +51,7 @@ export interface QRUsageStats {
  * Generates a new QR code valid for 30 seconds
  */
 export const generateQRCode = async (): Promise<QRGenerateResponse> => {
-  const response = await api.post('qr/generate');
+  const response = await api.post('qr-code/generate');
   return response.data;
 };
 
