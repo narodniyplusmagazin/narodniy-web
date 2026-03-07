@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react';
 import { useQRScreen } from './hooks/useQRScreen';
 import './styles.scss'; // Import your SCSS
@@ -13,21 +14,20 @@ export function QRScreen() {
   const [progressValue, setProgressValue] = useState(0);
 
   const {
-    // refreshing,
     subscription,
     qrData,
     usageStats,
     timeUntilExpiry,
     daysLeft,
     loading,
-    // onRefresh,
     handleRefreshQR,
-    // isUsageLimitReached,
-    // showQRFullscreen,
+    handleShowQR,
     setShowQRFullscreen,
     qrVisible,
-    setQrVisible,
     qrCountdown,
+    isGenerating,
+    qrError,
+    isUsageLimitReached,
   } = useQRScreen();
 
   const getStatusColor = () => {
@@ -36,21 +36,21 @@ export function QRScreen() {
     return 'success';
   };
 
-  // CSS-based progress animation
+  // CSS-based progress animation for 30-second countdown
   useEffect(() => {
-    if (qrVisible) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (qrVisible && qrCountdown > 0) {
       setProgressValue(0);
+      const duration = 30000; // 30 seconds
       const start = Date.now();
-      const duration = 10000;
       let frameId: number;
 
       const animate = () => {
         const now = Date.now();
-        const progress = Math.min((now - start) / duration, 1);
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
         setProgressValue(progress);
 
-        if (progress < 1) {
+        if (progress < 1 && qrVisible) {
           frameId = requestAnimationFrame(animate);
         }
       };
@@ -65,17 +65,29 @@ export function QRScreen() {
     } else {
       setProgressValue(0);
     }
-  }, [qrVisible]);
+  }, [qrVisible, qrCountdown]);
 
   const progressColor = () => {
-    if (progressValue < 0.7) return '#4CAF50'; // green
-    if (progressValue < 1) return '#FF9800'; // orange
-    return '#F44336'; // red
+    if (progressValue < 0.6) return '#4CAF50'; // green - 0-18 seconds
+    if (progressValue < 0.9) return '#FF9800'; // orange - 18-27 seconds
+    return '#F44336'; // red - 27-30 seconds
   };
 
   const progressWidth = () => `${progressValue * 100}%`;
 
-  const hasNoAvailableUsages = usageStats?.avalibleUsageCount === 0;
+  const hasNoAvailableUsages =
+    usageStats?.avalibleUsageCount === 0 || isUsageLimitReached();
+
+  if (loading) {
+    return (
+      <div className="qr-screen-container">
+        <div className="qr-loading">
+          <div className="spinner"></div>
+          <p>Загрузка QR-кода...</p>
+        </div>
+      </div>
+    );
+  }
   
 
   return (
@@ -111,10 +123,9 @@ export function QRScreen() {
               />
             )}
 
-            {
-            qrVisible ? (
+            {qrVisible && !hasNoAvailableUsages ? (
               <div className="qr-progress-container">
-               { !hasNoAvailableUsages && <div className="qr-progress-bar-bg">
+                <div className="qr-progress-bar-bg">
                   <div
                     className="qr-progress-bar"
                     style={{
@@ -122,37 +133,63 @@ export function QRScreen() {
                       backgroundColor: progressColor(),
                     }}
                   />
-                </div>}
+                </div>
 
                 <div className="qr-card-wrapper">
-                 
-                    <QRCodeCard
-                      qrData={qrData}
-                      daysLeft={daysLeft}
-                      loading={loading}
-                      onRefreshQR={handleRefreshQR}
-                      onRenewPress={() => router('/subscription')}
-                      onOpenFullscreen={() => setShowQRFullscreen(true)}
-                      hasNoAvailableUsages={hasNoAvailableUsages}
-                    />
-                   
+                  <QRCodeCard
+                    qrData={qrData}
+                    daysLeft={daysLeft}
+                    loading={isGenerating}
+                    onRefreshQR={handleRefreshQR}
+                    onRenewPress={() => router('/subscription')}
+                    onOpenFullscreen={() => setShowQRFullscreen(true)}
+                    hasNoAvailableUsages={hasNoAvailableUsages}
+                  />
                 </div>
 
                 <div className="qr-time-badge">
                   <span className="qr-time-icon">⏱️</span>
-                  {!hasNoAvailableUsages && <span>Скроется через {qrCountdown} сек</span>}
+                  <span>
+                    QR-код скроется через {qrCountdown} сек
+                  </span>
                 </div>
+              </div>
+            ) : !hasNoAvailableUsages ? (
+              <div className="qr-show-container">
+                {qrError && (
+                  <div className="qr-error-message">
+                    <span>⚠️ {qrError}</span>
+                  </div>
+                )}
+                <button
+                  className="qr-show-button"
+                  onClick={handleShowQR}
+                  disabled={isGenerating}
+                >
+                  {isGenerating ? (
+                    <>
+                      <span className="spinner-small"></span>
+                      <span>Генерация...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="qr-icon">🔲</span>
+                      <span>Показать QR-код</span>
+                    </>
+                  )}
+                </button>
+                <p className="qr-show-hint">
+                  {qrData
+                    ? 'QR-код истёк. Нажмите, чтобы получить новый'
+                    : 'QR-код скрыт для безопасности'}
+                </p>
               </div>
             ) : (
               <div className="qr-show-container">
-                <button
-                  className="qr-show-button"
-                  onClick={() => setQrVisible(true)}
-                >
-                  <span className="qr-icon">🔲</span>
-                  <span>Показать QR-код</span>
-                </button>
-                <p className="qr-show-hint">QR-код скрыт для безопасности</p>
+                <div className="qr-limit-message">
+                  <span>⚠️ Лимит использований исчерпан</span>
+                  <p>Новый QR-код будет доступен завтра</p>
+                </div>
               </div>
             )}
           </>

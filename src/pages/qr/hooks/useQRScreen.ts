@@ -1,6 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getTodayToken, getQrUsages } from '../../../api/qr-services';
+import {
+  generateQRCode as generateQRCodeAPI,
+  regenerateQRCode,
+  getQrUsages,
+  buildQRCodeURL,
+} from '../../../api/qr-services';
 import { SecureStorageService } from '../../../services/secure-storage-service';
 
 export interface Subscription {
@@ -13,10 +18,11 @@ export interface Subscription {
 }
 
 export interface QRData {
-  qrCode: string;
+  qrCode: string; // Full URL to encode in QR
+  qrToken: string; // Backend token
   generatedAt: string;
-  expiresAt: string;
-  subscriptionId: string;
+  expiresAt: string; // ISO timestamp
+  subscriptionId?: string;
 }
 
 export interface UsageStats {
@@ -33,6 +39,8 @@ export interface UsageStats {
   }[];
 }
 
+// const QR_LIFETIME_MS = 30000; // 30 seconds
+
 export const useQRScreen = () => {
   const router = useNavigate();
 
@@ -46,8 +54,129 @@ export const useQRScreen = () => {
   const [daysLeft, setDaysLeft] = useState(0);
   const [qrError, setQrError] = useState<string | null>(null);
   const [showQRFullscreen, setShowQRFullscreen] = useState(false);
-  const [qrVisible, setQrVisible] = useState(true);
-  const [qrCountdown, setQrCountdown] = useState(10);
+
+  // QR visibility and countdown (30 seconds)
+  const [qrVisible, setQrVisible] = useState(false);
+  const [qrCountdown, setQrCountdown] = useState(30);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Refs for intervals
+  const countdownIntervalRef = useRef<number | null>(null);
+  const expiryCheckIntervalRef = useRef<number | null>(null);
+
+  // Clear all intervals
+  const clearIntervals = useCallback(() => {
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+    if (expiryCheckIntervalRef.current) {
+      clearInterval(expiryCheckIntervalRef.current);
+      expiryCheckIntervalRef.current = null;
+    }
+  }, []);
+
+  // Generate QR Code (30 seconds validity)
+  const generateNewQR = useCallback(async () => {
+    setIsGenerating(true);
+    setQrError(null);
+
+    try {
+      const response = await generateQRCodeAPI();
+      const qrURL = buildQRCodeURL(response.qrToken);
+
+      setQrData({
+        qrCode: qrURL,
+        qrToken: response.qrToken,
+        generatedAt: new Date().toISOString(),
+        expiresAt: response.expiresAt,
+        subscriptionId: subscription?.id,
+      });
+
+      setQrVisible(true);
+      setQrCountdown(30);
+      startCountdown(response.expiresAt);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      const errorMsg =
+        error?.response?.data?.message || 'Не удалось сгенерировать QR-код';
+      setQrError(errorMsg);
+      console.error('Error generating QR:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [subscription?.id]);
+
+  // Regenerate QR Code
+  const regenerateQR = useCallback(async () => {
+    setIsGenerating(true);
+    setQrError(null);
+
+    try {
+      const response = await regenerateQRCode();
+      const qrURL = buildQRCodeURL(response.qrToken);
+
+      setQrData({
+        qrCode: qrURL,
+        qrToken: response.qrToken,
+        generatedAt: new Date().toISOString(),
+        expiresAt: response.expiresAt,
+        subscriptionId: subscription?.id,
+      });
+
+      setQrVisible(true);
+      setQrCountdown(30);
+      startCountdown(response.expiresAt);
+
+      // Reload usage stats after regeneration
+      if (subscription?.id) {
+        await loadUsageStats(subscription.id);
+      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      const errorMsg =
+        error?.response?.data?.message || 'Не удалось обновить QR-код';
+      setQrError(errorMsg);
+      console.error('Error regenerating QR:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [subscription?.id]);
+
+  // Start countdown timer
+  const startCountdown = useCallback(
+    (expiresAt: string) => {
+      clearIntervals();
+
+      const updateCountdown = () => {
+        const now = Date.now();
+        const expiry = new Date(expiresAt).getTime();
+        const remaining = Math.max(0, Math.floor((expiry - now) / 1000));
+
+        setQrCountdown(remaining);
+
+        if (remaining <= 0) {
+          setQrVisible(false);
+          clearIntervals();
+        }
+      };
+
+      // Initial update
+      updateCountdown();
+
+      // Update every second
+      countdownIntervalRef.current = setInterval(updateCountdown, 1000);
+    },
+    [clearIntervals]
+  );
+
+  // Handle show QR button click
+  const handleShowQR = useCallback(() => {
+    if (qrData && qrVisible) {
+      return; // QR already visible
+    }
+    regenerateQR();
+  }, [qrData, qrVisible, regenerateQR]);
 
   // Check if subscription is active
   const checkSubscriptionActive = (sub: Subscription): boolean => {
@@ -80,26 +209,6 @@ export const useQRScreen = () => {
       setTimeUntilExpiry(`${days} дней`);
     }
   }, [subscription]);
-
-  // Generate local QR code (fallback)
-  const generateLocalQR = useCallback(
-    (subscriptionId?: string) => {
-      const subId = subscriptionId || subscription?.id;
-      if (!subId) return;
-
-      const now = new Date();
-      const expiry = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-      const randomSalt = Math.random().toString(36).substring(7);
-
-      setQrData({
-        qrCode: `${subId}_${now.toDateString()}_${randomSalt}`,
-        generatedAt: now.toISOString(),
-        expiresAt: expiry.toISOString(),
-        subscriptionId: subId,
-      });
-    },
-    [subscription?.id]
-  );
 
   // Load usage statistics
   const loadUsageStats = useCallback(
@@ -155,59 +264,6 @@ export const useQRScreen = () => {
     [subscription?.maxUsagesPerDay]
   );
 
-  // Generate QR code
-  const generateQRCode = useCallback(
-    async (subscriptionId: string) => {
-      try {
-        if (!subscriptionId) {
-          console.error('❌ No subscription ID provided');
-          return;
-        }
-
-        setQrError(null);
-
-        const userData = SecureStorageService.getUserData();
-        if (!userData?.id) {
-          throw new Error('User ID not found');
-        }
-
-        // Получаем сегодняшний токен
-        const response = await getTodayToken(subscriptionId);
-
-        // Загружаем статистику использования
-        await loadUsageStats(subscriptionId);
-
-        if (!response.token) {
-          console.error('❌ No token in response');
-          throw new Error('Token not received from server');
-        }
-
-        // Конвертируем токен в строку, если это объект
-        let tokenString: string;
-        if (typeof response.token === 'object') {
-          tokenString = JSON.stringify(response.token);
-        } else if (typeof response.token !== 'string') {
-          tokenString = String(response.token);
-        } else {
-          tokenString = response.token;
-        }
-
-        const qrDataToSet = {
-          qrCode: tokenString.length > 2000 ? subscriptionId : tokenString,
-          generatedAt: response.validFrom,
-          expiresAt: response.validTo,
-          subscriptionId: response.subscriptionId,
-        };
-
-        setQrData(qrDataToSet);
-      } catch (error) {
-        console.log(error, 'Ошибка генерации QR');
-        setQrError('Не удалось сгенерировать QR-код');
-        generateLocalQR(subscriptionId);
-      }
-    },
-    [generateLocalQR, loadUsageStats]
-  );
 
   // Load all data
   const loadInitialData = async () => {
@@ -223,7 +279,7 @@ export const useQRScreen = () => {
 
       const subscriptionData = SecureStorageService.getSubscription();
 
-      if (!subscriptionData || !subscriptionData.id) {
+      if (!subscriptionData?.id) {
         setLoading(false);
         return;
       }
@@ -235,84 +291,33 @@ export const useQRScreen = () => {
         startDate: subscriptionData.startDate,
         endDate: subscriptionData.endDate,
         isActive:
-          subscriptionData.isActive !== undefined
-            ? subscriptionData.isActive
-            : true,
+          subscriptionData.isActive === undefined || subscriptionData.isActive,
         maxUsagesPerDay: subscriptionData.maxUsagesPerDay || 5,
       };
 
       const isActive = checkSubscriptionActive(subscription);
+      setSubscription(subscription);
+
       if (!isActive) {
-        setSubscription(subscription);
         setLoading(false);
         return;
       }
 
-      setSubscription(subscription);
-
-      // Generate QR code inline
-      try {
-        if (subscription.id) {
-          const userData = SecureStorageService.getUserData();
-          if (!userData?.id) {
-            throw new Error('User ID not found');
-          }
-
-          const response = await getTodayToken(subscription.id);
-
-          // Загружаем статистику использования
-          await loadUsageStats(subscription.id);
-
-          if (response.token) {
-            let tokenString: string;
-            if (typeof response.token === 'object') {
-              tokenString = JSON.stringify(response.token);
-            } else if (typeof response.token !== 'string') {
-              tokenString = String(response.token);
-            } else {
-              tokenString = response.token;
-            }
-
-            const qrDataToSet = {
-              qrCode: tokenString.length > 2000 ? subscription.id : tokenString,
-              generatedAt: response.validFrom,
-              expiresAt: response.validTo,
-              subscriptionId: response.subscriptionId,
-            };
-
-            setQrData(qrDataToSet);
-          } else {
-            console.log('❌ No token in response');
-          }
-        }
-      } catch (error) {
-        console.error('❌ QR generation error:', error);
-        console.log(error, 'Ошибка генерации QR');
-        setQrError('Не удалось сгенерировать QR-код');
-        // Fallback to local QR
-        if (subscription.id) {
-          const now = new Date();
-          const expiry = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-          const randomSalt = Math.random().toString(36).substring(7);
-          setQrData({
-            qrCode: `${subscription.id}_${now.toDateString()}_${randomSalt}`,
-            generatedAt: now.toISOString(),
-            expiresAt: expiry.toISOString(),
-            subscriptionId: subscription.id,
-          });
-        }
+      // Load usage stats
+      if (subscription.id) {
+        await loadUsageStats(subscription.id);
       }
 
-      // Load usage stats
+      // Auto-generate QR on mount
+      await generateNewQR();
     } catch (error) {
       console.error('❌ Load initial data error:', error);
-      console.log(error, 'Ошибка загрузки данных');
       setQrError('Не удалось загрузить данные');
     } finally {
-      console.log('✅ Loading complete');
       setLoading(false);
     }
   };
+
 
   // Pull-to-refresh
   const onRefresh = async () => {
@@ -321,69 +326,25 @@ export const useQRScreen = () => {
     setRefreshing(false);
   };
 
-  // Manual QR refresh
+  // Manual QR refresh (regenerate)
   const handleRefreshQR = async () => {
-    if (!subscription?.id) {
-      window.alert('Ошибка: Данные подписки не найдены');
-      return;
-    }
-
-    const confirmRefresh = window.confirm(
-      'Текущий QR-код станет недействительным. Обновить?'
-    );
-
-    if (!confirmRefresh) return;
-
-    try {
-      setLoading(true);
-
-      const response = await getTodayToken(subscription.id);
-
-      // Конвертируем токен в строку, если это объект
-      let tokenString: string;
-      if (typeof response.token === 'object') {
-        tokenString = JSON.stringify(response.token);
-      } else if (typeof response.token !== 'string') {
-        tokenString = String(response.token);
-      } else {
-        tokenString = response.token;
-      }
-
-      setQrData({
-        qrCode: tokenString,
-        generatedAt: response.validFrom,
-        expiresAt: response.validTo,
-        subscriptionId: response.subscriptionId,
-      });
-
-      window.alert('Готово: QR-код успешно обновлен');
-    } catch (error) {
-      console.error('QR Refresh Error:', error);
-      console.log(error, 'Ошибка обновления QR');
-    } finally {
-      setLoading(false);
-    }
+    if (isGenerating) return;
+    await regenerateQR();
   };
 
   // Check if usage limit is reached
   const isUsageLimitReached = () => {
     if (!usageStats) return false;
-    return usageStats.usagesToday >= usageStats.maxUsagesPerDay;
+    return usageStats.avalibleUsageCount <= 0;
   };
 
-  // Load data on mount and when screen comes into focus
+  // Load data on mount
   useEffect(() => {
     loadInitialData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  // Refresh QR on mount
-  useEffect(() => {
-    if (subscription?.id) {
-      generateQRCode(subscription.id);
-    }
-  }, [subscription?.id, generateQRCode]);
 
-  // Update timer
+  // Update subscription timer
   useEffect(() => {
     if (subscription) {
       updateTimeLeft();
@@ -392,39 +353,12 @@ export const useQRScreen = () => {
     }
   }, [subscription, updateTimeLeft]);
 
-  // Auto-refresh QR code
+  // Cleanup intervals on unmount
   useEffect(() => {
-    if (qrData && subscription?.id) {
-      const checkExpiry = setInterval(() => {
-        const now = new Date();
-        const expiry = new Date(qrData.expiresAt);
-        if (now >= expiry && subscription?.id) {
-          generateQRCode(subscription.id);
-        }
-      }, 60000);
-      return () => clearInterval(checkExpiry);
-    }
-  }, [qrData, subscription?.id, generateQRCode]);
-
-  // Auto-hide QR code after 10 seconds with countdown
-  useEffect(() => {
-    if (qrVisible && qrData && subscription?.id) {
-      // Reset countdown when QR becomes visible
-      setQrCountdown(10);
-
-      const countdownInterval = setInterval(() => {
-        setQrCountdown((prev) => {
-          if (prev <= 1) {
-            setQrVisible(false);
-            return 10;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(countdownInterval);
-    }
-  }, [qrVisible, qrData, subscription?.id]);
+    return () => {
+      clearIntervals();
+    };
+  }, [clearIntervals]);
 
   return {
     loading,
@@ -437,11 +371,13 @@ export const useQRScreen = () => {
     qrError,
     onRefresh,
     handleRefreshQR,
+    handleShowQR,
     isUsageLimitReached,
     showQRFullscreen,
     setShowQRFullscreen,
     qrVisible,
     setQrVisible,
     qrCountdown,
+    isGenerating,
   };
 };

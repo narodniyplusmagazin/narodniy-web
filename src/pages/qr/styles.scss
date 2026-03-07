@@ -11,15 +11,80 @@
     padding: 16px;
 }
 
+/* Loading State */
+.qr-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 16px;
+
+    p {
+        font-size: 16px;
+        color: #666;
+    }
+}
+
+/* Spinner */
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(46, 134, 171, 0.2);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.spinner-small {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Progress Container */
 .qr-progress-container {
     position: relative;
     margin-top: 16px;
+    animation: fadeIn 0.3s ease-out;
 }
 
-.qr-progress-bar {
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Progress Bar Background */
+.qr-progress-bar-bg {
     width: 100%;
-    height: 4px;
-    margin-bottom: 8px;
+    height: 5px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+/* Progress Bar */
+.qr-progress-bar {
+    height: 100%;
+    transition: width 0.1s linear, background-color 0.3s ease;
+    border-radius: 10px;
 }
 
 .qr-progress-bar.success {
@@ -34,39 +99,138 @@
     background-color: red;
 }
 
+
 .qr-card-wrapper {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    animation: fadeIn 0.3s ease-out;
 }
 
+/* Time Badge */
 .qr-time-badge {
     display: flex;
     align-items: center;
-    font-size: 14px;
-    color: #666;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, rgba(46, 134, 171, 0.1), rgba(162, 59, 114, 0.1));
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    .qr-time-icon {
+        font-size: 18px;
+    }
+
+    span {
+        line-height: 1.2;
+    }
 }
 
+/* Show QR Container */
 .qr-show-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 16px;
+    justify-content: center;
+    margin-top: 24px;
+    padding: 32px 16px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    animation: fadeIn 0.3s ease-out;
 }
 
+/* QR Error Message */
+.qr-error-message {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    text-align: center;
+
+    span {
+        color: #f44336;
+        font-size: 14px;
+        font-weight: 500;
+    }
+}
+
+/* QR Limit Message */
+.qr-limit-message {
+    text-align: center;
+    padding: 24px 16px;
+
+    span {
+        font-size: 18px;
+        font-weight: 600;
+        color: #FF9800;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    p {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+    }
+}
+
+/* Show QR Button */
 .qr-show-button {
     display: flex;
     align-items: center;
-    padding: 8px 16px;
-    background: #007bff;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 32px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #2274a8 100%);
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
+    min-width: 200px;
+    min-height: 54px;
+
+    .qr-icon {
+        font-size: 24px;
+    }
+
+    &:hover:not(:disabled) {
+        background: linear-gradient(135deg, #2274a8 0%, #1e5f8a 100%);
+        box-shadow: 0 6px 16px rgba(46, 134, 171, 0.4);
+        transform: translateY(-2px);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(46, 134, 171, 0.3);
+    }
+
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        box-shadow: 0 2px 8px rgba(46, 134, 171, 0.2);
+
+        &:hover {
+            transform: none;
+        }
+    }
 }
 
+/* Show QR Hint */
 .qr-show-hint {
-    margin-top: 8px;
-    font-size: 12px;
+    margin-top: 12px;
+    font-size: 13px;
     color: #999;
+    text-align: center;
+    line-height: 1.5;
 }
 
 .renew-button {

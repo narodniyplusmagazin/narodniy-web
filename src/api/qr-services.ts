@@ -1,15 +1,24 @@
-import api from './axios-instance';
+import api, { API_BASE } from './axios-instance';
 
-// Response from POST /qr/generate
+// Response from POST /qr/generate (NEW 30-second QR)
 export interface QRGenerateResponse {
-  token: string;
-  validFrom: string;
-  validTo: string;
-  isUsed: boolean;
-  subscriptionId: string;
+  qrToken: string;
+  expiresAt: string; // ISO timestamp
 }
 
-// Response from GET /qr/today/:subscriptionId
+// Response from POST /qr/regenerate (NEW 30-second QR)
+export interface QRRegenerateResponse {
+  qrToken: string;
+  expiresAt: string; // ISO timestamp
+}
+
+// Response from GET /qr/scan/:token
+export interface QRScanResponse {
+  status: 'success' | 'QR_EXPIRED' | 'QR_ALREADY_USED' | 'QR_INVALID';
+  message?: string;
+}
+
+// Legacy response from GET /qr/today/:subscriptionId
 export interface QRTodayTokenResponse {
   dailyLimit: number;
   isUsed: boolean;
@@ -35,7 +44,47 @@ export interface QRUsageStats {
   dailyLimit: number;
 }
 
-// POST /qr/generate - Генерирует ежедневный QR код
+// ===== NEW 30-SECOND QR ENDPOINTS =====
+
+/**
+ * POST /qr/generate
+ * Generates a new QR code valid for 30 seconds
+ */
+export const generateQRCode = async (): Promise<QRGenerateResponse> => {
+  const response = await api.post('qr/generate');
+  return response.data;
+};
+
+/**
+ * POST /qr/regenerate
+ * Regenerates a new QR code (doesn't affect daily usage)
+ */
+export const regenerateQRCode = async (): Promise<QRRegenerateResponse> => {
+  const response = await api.post('qr/regenerate');
+  return response.data;
+};
+
+/**
+ * GET /qr/scan/:token
+ * Scans and validates a QR token (backend only)
+ */
+export const scanQRCode = async (
+  token: string
+): Promise<QRScanResponse> => {
+  const response = await api.get(`qr/scan/${token}`);
+  return response.data;
+};
+
+/**
+ * Build QR URL for encoding
+ */
+export const buildQRCodeURL = (qrToken: string): string => {
+  return `${API_BASE}qr/scan/${qrToken}`;
+};
+
+// ===== LEGACY ENDPOINTS =====
+
+// POST /qr-code/generate - Legacy daily QR code (DEPRECATED)
 export const generateQR = async (
   subscriptionId: string,
   userId: string
@@ -45,31 +94,21 @@ export const generateQR = async (
     subscriptionId,
   });
 
-  return response.data;
+  return response.data as QRGenerateResponse;
 };
 
-// GET /qr/today/:subscriptionId - Получить сегодняшний токен
+// GET /qr-code/today/:subscriptionId - Legacy get today token
 export const getTodayToken = async (
   subscriptionId: string
 ): Promise<QRTodayTokenResponse> => {
-  console.log(subscriptionId);
-
   const response = await api.get(`qr-code/today/${subscriptionId}`);
-
   return response.data;
 };
 
-// POST /qr/use/:subscriptionId - Отметить использование QR кода
-// export const markQrUsage = async (subscriptionId: string) => {
-//   const response = await api.post(`qr/use/${subscriptionId}`);
-//   return response.data;
-// };
-
-// GET /qr/usages/:subscriptionId - Получить статистику использования
+// GET /qr-code/usages/:subscriptionId - Legacy usage statistics
 export const getQrUsages = async (
   subscriptionId: string
 ): Promise<QRUsageStats> => {
   const response = await api.get(`qr-code/usages/${subscriptionId}`);
-
   return response.data;
 };
