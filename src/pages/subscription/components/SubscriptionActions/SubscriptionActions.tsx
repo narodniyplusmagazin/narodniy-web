@@ -52,8 +52,8 @@ export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
       const paymentData = await createPayment(
         userEmail || userPhone,
         userId,
-        'http://localhost:5173/subscription',
-        // 'https://narodniyplus.ru/subscription',
+        // 'http://localhost:5173/subscription',
+        'https://narodniyplus.ru/subscription',
       );
 
       if (paymentData?.confirmationUrl) {
