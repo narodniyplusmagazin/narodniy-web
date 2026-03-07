@@ -1,15 +1,18 @@
-import api, { API_BASE } from './axios-instance';
+import api from './axios-instance';
 
-// Response from POST /qr/generate (NEW 30-second QR)
+// Response from POST /qr-code/generate (NEW 30-second QR)
 export interface QRGenerateResponse {
-  qrToken: string;
-  expiresAt: string; // ISO timestamp
-}
-
-// Response from POST /qr/regenerate (NEW 30-second QR)
-export interface QRRegenerateResponse {
-  qrToken: string;
-  expiresAt: string; // ISO timestamp
+  token: string; // Prefixed token like "QR_xxx"
+  rawToken: string; // Actual token
+  validFrom: string;
+  validTo: string;
+  usageCount: number;
+  remainingUses: number;
+  avalibleUsageCount: number;
+  dailyLimit: number;
+  isUsed: boolean;
+  subscriptionId: string;
+  qrWithPrefix?: string;
 }
 
 // Response from GET /qr/scan/:token
@@ -47,20 +50,32 @@ export interface QRUsageStats {
 // ===== NEW 30-SECOND QR ENDPOINTS =====
 
 /**
- * POST /qr/generate
- * Generates a new QR code valid for 30 seconds
+ * POST /qr-code/generate
+ * Generates a new daily QR code (valid for 30 seconds display)
  */
-export const generateQRCode = async (): Promise<QRGenerateResponse> => {
-  const response = await api.post('qr-code/generate');
+export const generateQRCode = async (
+  userId: string,
+  subscriptionId: string
+): Promise<QRGenerateResponse> => {
+  const response = await api.post('qr-code/generate', {
+    userId,
+    subscriptionId,
+  });
   return response.data;
 };
 
 /**
- * POST /qr/regenerate
+ * POST /qr-code/regenerate
  * Regenerates a new QR code (doesn't affect daily usage)
  */
-export const regenerateQRCode = async (): Promise<QRRegenerateResponse> => {
-  const response = await api.post('qr-code/regenerate');
+export const regenerateQRCode = async (
+  userId: string,
+  subscriptionId: string
+): Promise<QRGenerateResponse> => {
+  const response = await api.post('qr-code/generate', {
+    userId,
+    subscriptionId,
+  });
   return response.data;
 };
 
@@ -78,8 +93,9 @@ export const scanQRCode = async (
 /**
  * Build QR URL for encoding
  */
-export const buildQRCodeURL = (qrToken: string): string => {
-  return `${API_BASE}qr/scan/${qrToken}`;
+export const buildQRCodeURL = (token: string): string => {
+  // Token is already prefixed (e.g., "QR_xxx")
+  return token;
 };
 
 // ===== LEGACY ENDPOINTS =====
