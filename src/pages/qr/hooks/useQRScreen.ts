@@ -90,17 +90,20 @@ export const useQRScreen = () => {
       const response = await generateQRCodeAPI(userData.id, subscription.id);
       const qrURL = buildQRCodeURL(response.token);
 
+      // Calculate 30 seconds from now for UI countdown
+      const displayExpiresAt = new Date(Date.now() + 30000).toISOString();
+
       setQrData({
         qrCode: qrURL,
         qrToken: response.token,
         generatedAt: new Date().toISOString(),
-        expiresAt: response.validTo,
+        expiresAt: response.validTo, // Backend expiry (e.g., 3 hours)
         subscriptionId: subscription.id,
       });
 
       setQrVisible(true);
       setQrCountdown(30);
-      startCountdown(response.validTo);
+      startCountdown(displayExpiresAt); // Use 30-second countdown for display
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const errorMsg =
@@ -129,17 +132,20 @@ export const useQRScreen = () => {
       const response = await regenerateQRCode(userData.id, subscription.id);
       const qrURL = buildQRCodeURL(response.token);
 
+      // Calculate 30 seconds from now for UI countdown
+      const displayExpiresAt = new Date(Date.now() + 30000).toISOString();
+
       setQrData({
         qrCode: qrURL,
         qrToken: response.token,
         generatedAt: new Date().toISOString(),
-        expiresAt: response.validTo,
+        expiresAt: response.validTo, // Backend expiry (e.g., 3 hours)
         subscriptionId: subscription.id,
       });
 
       setQrVisible(true);
       setQrCountdown(30);
-      startCountdown(response.validTo);
+      startCountdown(displayExpiresAt); // Use 30-second countdown for display
 
       // Reload usage stats after regeneration
       await loadUsageStats(subscription.id);
