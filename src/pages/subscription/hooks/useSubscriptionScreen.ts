@@ -115,6 +115,8 @@ export const useSubscriptionScreen = () => {
       SecureStorageService.saveSubscription(subscriptionData);
 
       try {
+        console.log(subscriptionData.id, userData.id, "118");
+
         await generateQR(subscriptionData.id, userData.id);
       } catch (qrError) {
         console.warn('QR generation failed, will retry on QR screen:', qrError);
@@ -157,6 +159,8 @@ export const useSubscriptionScreen = () => {
       SecureStorageService.saveSubscription(subscriptionData);
 
       try {
+        console.log(subscriptionData.id, userData.id, "160");
+        
         await generateQR(subscriptionData.id, userData.id);
       } catch (qrError) {
         console.warn('QR generation failed, will retry on QR screen:', qrError);
