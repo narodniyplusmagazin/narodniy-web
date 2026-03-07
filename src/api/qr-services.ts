@@ -60,7 +60,7 @@ export const generateQRCode = async (): Promise<QRGenerateResponse> => {
  * Regenerates a new QR code (doesn't affect daily usage)
  */
 export const regenerateQRCode = async (): Promise<QRRegenerateResponse> => {
-  const response = await api.post('qr/regenerate');
+  const response = await api.post('qr-code/regenerate');
   return response.data;
 };
 
