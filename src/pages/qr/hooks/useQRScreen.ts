@@ -191,8 +191,7 @@ export const useQRScreen = () => {
   // Handle show QR button click
   const handleShowQR = useCallback(() => {
     regenerateQR();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [regenerateQR]);
 
   // Check if subscription is active
   const checkSubscriptionActive = (sub: Subscription): boolean => {
