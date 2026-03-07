@@ -88,6 +88,10 @@ export function QRScreen() {
       </div>
     );
   }
+
+  console.log(qrData?.qrToken, "qr token");
+  console.log(qrData?.qrCode, "qr code");
+  
   
 
   return (
