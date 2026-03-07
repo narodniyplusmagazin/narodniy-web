@@ -10,7 +10,7 @@ import { useAuthStore } from '../../shared/stores/auth-store';
 export type RegistrationForm = {
   fullName: string;
   phone: string;
-  email?: string | null;
+  email: string;
   gender: 'male' | 'female';
   password: string;
   code: string;
@@ -21,7 +21,7 @@ export const RegistrationScreen: React.FC = () => {
   const [form, setForm] = useState<RegistrationForm>({
     fullName: '',
     phone: '+7',
-    email: null,
+    email: '',
     gender: 'male',
     password: '',
     code: '',
@@ -62,8 +62,13 @@ export const RegistrationScreen: React.FC = () => {
       return;
     }
 
-    // Validate email only if it's provided and not empty
-    if (form.email && form.email.trim() && !validateEmail(form.email.trim())) {
+    // Validate email is provided and valid
+    if (!form.email.trim()) {
+      alert('Ошибка валидации - Введите email');
+      return;
+    }
+
+    if (!validateEmail(form.email.trim())) {
       alert('Ошибка валидации - Неверный формат email');
       return;
     }
@@ -175,20 +180,21 @@ export const RegistrationScreen: React.FC = () => {
             <div className="input-group">
               <label className="input-label">
                 <Mail size={18} className="label-icon" />
-                Email
+                Email *
               </label>
               <input
-                type="text"
+                type="email"
                 className="form-input"
                 placeholder="example@mail.com"
-                value={form.email || ''}
+                value={form.email}
                 onChange={(e) => {
                   const value = e.target.value.toLowerCase().trim();
                   setForm({
                     ...form,
-                    email: value === '' ? null : value,
+                    email: value,
                   });
                 }}
+                required
               />
             </div>
 

@@ -7,28 +7,90 @@ import { SecureStorageService } from '../../services/secure-storage-service';
 import { useAuthStore } from '../../shared/stores/auth-store';
 import { login } from '../../api/auth-api';
 
+interface FieldErrors {
+  emailOrPhone?: string;
+  password?: string;
+}
+
 export const LoginScreen: React.FC = () => {
   const navigate = useNavigate();
   const { setAuthenticated } = useAuthStore();
-  const [, setLoading] = useState<boolean>(false);
-  const [hasError, setHasError] = useState<{
-    isError: boolean;
-    msg: string;
-  } | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [generalError, setGeneralError] = useState<string>('');
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [form, setForm] = useState({
     emailOrPhone: '',
     password: '',
   });
 
+  const validateForm = (): boolean => {
+    const errors: FieldErrors = {};
+    let isValid = true;
+
+    if (!form.emailOrPhone.trim()) {
+      errors.emailOrPhone = 'Введите email или номер телефона';
+      isValid = false;
+    }
+
+    if (!form.password.trim()) {
+      errors.password = 'Введите пароль';
+      isValid = false;
+    } else if (form.password.length < 4) {
+      errors.password = 'Пароль должен содержать минимум 4 символа';
+      isValid = false;
+    }
+
+    setFieldErrors(errors);
+    return isValid;
+  };
+
+  const getErrorMessage = (error: any): string => {
+    const message = error?.response?.data?.message?.toLowerCase() || '';
+    const status = error?.response?.status;
+
+    // Network errors
+    if (!error?.response) {
+      return 'Ошибка подключения. Проверьте интернет-соединение';
+    }
+
+    // Server errors
+    if (status >= 500) {
+      return 'Ошибка сервера. Попробуйте позже';
+    }
+
+    // Authentication errors
+    if (status === 401 || message.includes('invalid') || message.includes('incorrect')) {
+      return 'Неверный email/телефон или пароль';
+    }
+
+    if (status === 404 || message.includes('not found')) {
+      return 'Пользователь не найден';
+    }
+
+    if (status === 403) {
+      return 'Доступ запрещен. Проверьте ваши данные';
+    }
+
+    // Rate limiting
+    if (status === 429) {
+      return 'Слишком много попыток. Подождите немного';
+    }
+
+    return error?.response?.data?.message || 'Произошла ошибка при входе';
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!form.emailOrPhone.trim() || !form.password.trim()) {
-      alert('Заполните все поля');
+    // Clear previous errors
+    setGeneralError('');
+    setFieldErrors({});
+
+    // Validate form
+    if (!validateForm()) {
       return;
     }
 
-    setHasError(null);
     setLoading(true);
 
     try {
@@ -38,8 +100,8 @@ export const LoginScreen: React.FC = () => {
       );
 
       if (!res?.access_token) {
+        setGeneralError('Неверный формат ответа от сервера');
         setLoading(false);
-        alert('Неверный формат ответа от сервера');
         return;
       }
 
@@ -54,10 +116,7 @@ export const LoginScreen: React.FC = () => {
       setAuthenticated(true);
       navigate('/');
     } catch (error: any) {
-      setHasError({
-        isError: true,
-        msg: error?.response?.data?.message || 'Unknown error',
-      });
+      setGeneralError(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -80,11 +139,11 @@ export const LoginScreen: React.FC = () => {
 
           {/* Form Card */}
           <div className="form-card">
-            {/* Error Message */}
-            {hasError?.isError && (
+            {/* General Error Message */}
+            {generalError && (
               <div className="error-container">
                 <AlertCircle size={20} className="error-icon" />
-                <span className="error-text">{hasError.msg}</span>
+                <span className="error-text">{generalError}</span>
               </div>
             )}
 
@@ -96,17 +155,27 @@ export const LoginScreen: React.FC = () => {
               </label>
               <input
                 type="text"
-                className="form-input"
-                placeholder="Введите email или телефон"
+                className={`form-input ${
+                  fieldErrors.emailOrPhone ? 'input-error' : ''
+                } ${form.emailOrPhone && !fieldErrors.emailOrPhone ? 'input-valid' : ''}`}
+                placeholder="example@mail.com или +7 XXX XXX XX XX"
                 value={form.emailOrPhone}
-                onChange={(e) =>
+                onChange={(e) => {
                   setForm((prev) => ({
                     ...prev,
                     emailOrPhone: e.target.value.toLowerCase(),
-                  }))
-                }
-                required
+                  }));
+                  // Clear error on change
+                  if (fieldErrors.emailOrPhone) {
+                    setFieldErrors((prev) => ({ ...prev, emailOrPhone: undefined }));
+                  }
+                  setGeneralError('');
+                }}
+                disabled={loading}
               />
+              {fieldErrors.emailOrPhone && (
+                <span className="field-error-text">{fieldErrors.emailOrPhone}</span>
+              )}
             </div>
 
             {/* Password Input */}
@@ -116,26 +185,43 @@ export const LoginScreen: React.FC = () => {
                   <Lock size={18} className="label-icon" />
                   Пароль
                 </label>
-                <Link to="/forgot-password" className="forgot-link">
+                <Link to="/forgot-password" className="forgot-link" tabIndex={loading ? -1 : 0}>
                   Забыли пароль?
                 </Link>
               </div>
               <input
                 type="password"
-                className="form-input"
+                className={`form-input ${
+                  fieldErrors.password ? 'input-error' : ''
+                } ${form.password && !fieldErrors.password ? 'input-valid' : ''}`}
                 placeholder="Введите ваш пароль"
                 value={form.password}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, password: e.target.value }))
-                }
-                required
+                onChange={(e) => {
+                  setForm((prev) => ({ ...prev, password: e.target.value }));
+                  // Clear error on change
+                  if (fieldErrors.password) {
+                    setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                  }
+                  setGeneralError('');
+                }}
+                disabled={loading}
               />
+              {fieldErrors.password && (
+                <span className="field-error-text">{fieldErrors.password}</span>
+              )}
             </div>
           </div>
 
           {/* Login Button */}
-          <button type="submit" className="login-button">
-            🔓 Войти
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? (
+              <>
+                <span className="spinner"></span>
+                Вход...
+              </>
+            ) : (
+              <>🔓 Войти</>
+            )}
           </button>
 
           {/* Footer */}

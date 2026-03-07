@@ -100,6 +100,7 @@
 
 /* Error Container */
 .error-container {
+    height: auto;
     display: flex;
     align-items: flex-start;
     gap: 12px;
@@ -184,14 +185,50 @@
         box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.1);
     }
 
-    &:hover:not(:focus) {
+    &:hover:not(:focus):not(:disabled) {
         border-color: #d0d0d0;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background-color: #f5f5f5;
+    }
+
+    // Error state
+    &.input-error {
+        border-color: #f44336;
+        background-color: rgba(244, 67, 54, 0.05);
+
+        &:focus {
+            border-color: #f44336;
+            box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+        }
+    }
+
+    // Valid state
+    &.input-valid {
+        border-color: #4caf50;
+
+        &:focus {
+            border-color: #4caf50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
     }
 
     // Prevent zoom on iOS when input is focused
     @media (max-width: 480px) {
         font-size: 16px;
     }
+}
+
+/* Field Error Text */
+.field-error-text {
+    font-size: 12px;
+    color: #f44336;
+    margin-top: -4px;
+    animation: slideDown 0.2s ease-out;
+    display: block;
 }
 
 /* Password Header */
@@ -233,32 +270,54 @@
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
     margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 48px;
 
-    &:hover {
+    &:hover:not(:disabled) {
         background: linear-gradient(135deg, #2274a8 0%, #1e5f8a 100%);
         box-shadow: 0 6px 16px rgba(46, 134, 171, 0.4);
         transform: translateY(-2px);
     }
 
-    &:active {
+    &:active:not(:disabled) {
         transform: translateY(0);
         box-shadow: 0 2px 8px rgba(46, 134, 171, 0.3);
     }
 
     &:disabled {
-        opacity: 0.6;
+        opacity: 0.7;
         cursor: not-allowed;
-        box-shadow: none;
+        box-shadow: 0 2px 8px rgba(46, 134, 171, 0.2);
         transform: none;
 
         &:hover {
             transform: none;
+            box-shadow: 0 2px 8px rgba(46, 134, 171, 0.2);
         }
     }
 
     @media (max-width: 480px) {
         padding: 13px 20px;
         font-size: 15px;
+    }
+}
+
+/* Loading Spinner */
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
 }
 
@@ -327,6 +386,7 @@
     }
 
     .error-container {
+        height: auto;
         padding: 11px 12px;
         border-radius: 8px;
 

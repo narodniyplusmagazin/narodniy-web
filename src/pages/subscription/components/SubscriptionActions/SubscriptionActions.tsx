@@ -19,22 +19,21 @@ interface SubscriptionActionsProps {
 
 export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
   isActive,
-  // subscribing,
+  subscribing,
   hasActiveSubscription = false,
   userId,
   userEmail,
   userPhone,
-  userData,
 }) => {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
-  // Check if user is NARODNIY
-  const isNarodniy = userData?.fullName?.toUpperCase() === 'NARODNIY';
+  const isDisabled =
+      !isActive || subscribing || hasActiveSubscription || paymentLoading;
+
 
   // Determine button text
   const getButtonText = () => {
-    if (!isNarodniy) return 'Подписка временно недоступно';
     if (hasActiveSubscription) return 'У вас уже есть подписку';
     if (paymentLoading) return 'Обработка...';
     return 'Оформить подписку';
@@ -81,10 +80,12 @@ export const SubscriptionActions: React.FC<SubscriptionActionsProps> = ({
           : 'Оформить подписку'}
       </button> */}
 
+      
+
       <button
-        className={`button ${isNarodniy ? '' : 'button-disabled'}`}
+        className={`button ${isDisabled ? 'button-disabled' : ''}`}
         onClick={handleRealPayment}
-        disabled={!isNarodniy}
+        disabled={isDisabled}
       >
         {getButtonText()}
       </button>
