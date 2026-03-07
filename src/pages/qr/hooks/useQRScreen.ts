@@ -62,18 +62,6 @@ export const useQRScreen = () => {
   const countdownIntervalRef = useRef<number | null>(null);
   const expiryCheckIntervalRef = useRef<number | null>(null);
 
-  // Clear all intervals
-  const clearIntervals = useCallback(() => {
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-      countdownIntervalRef.current = null;
-    }
-    if (expiryCheckIntervalRef.current) {
-      clearInterval(expiryCheckIntervalRef.current);
-      expiryCheckIntervalRef.current = null;
-    }
-  }, []);
-
   // Generate QR Code (30 seconds validity)
   const generateNewQR = useCallback(async () => {
     if (!subscription?.id) return;
@@ -164,7 +152,15 @@ export const useQRScreen = () => {
   // Start countdown timer
   const startCountdown = useCallback(
     (expiresAt: string) => {
-      clearIntervals();
+      // Clear existing intervals
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+      if (expiryCheckIntervalRef.current) {
+        clearInterval(expiryCheckIntervalRef.current);
+        expiryCheckIntervalRef.current = null;
+      }
 
       const updateCountdown = () => {
         const now = Date.now();
@@ -175,7 +171,11 @@ export const useQRScreen = () => {
 
         if (remaining <= 0) {
           setQrVisible(false);
-          clearIntervals();
+          // Clear intervals
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
         }
       };
 
@@ -185,16 +185,14 @@ export const useQRScreen = () => {
       // Update every second
       countdownIntervalRef.current = setInterval(updateCountdown, 1000);
     },
-    [clearIntervals]
+    []
   );
 
   // Handle show QR button click
   const handleShowQR = useCallback(() => {
-    if (qrData && qrVisible) {
-      return; // QR already visible
-    }
     regenerateQR();
-  }, [qrData, qrVisible, regenerateQR]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Check if subscription is active
   const checkSubscriptionActive = (sub: Subscription): boolean => {
@@ -284,7 +282,7 @@ export const useQRScreen = () => {
 
 
   // Load all data
-  const loadInitialData = async () => {
+  const loadInitialData = useCallback(async () => {
     try {
       setLoading(true);
       setQrError(null);
@@ -325,16 +323,13 @@ export const useQRScreen = () => {
       if (subscription.id) {
         await loadUsageStats(subscription.id);
       }
-
-      // Auto-generate QR on mount
-      await generateNewQR();
     } catch (error) {
       console.error('❌ Load initial data error:', error);
       setQrError('Не удалось загрузить данные');
     } finally {
       setLoading(false);
     }
-  };
+  }, [router, loadUsageStats]);
 
 
   // Pull-to-refresh
@@ -359,8 +354,15 @@ export const useQRScreen = () => {
   // Load data on mount
   useEffect(() => {
     loadInitialData();
+  }, [loadInitialData]);
+
+  // Auto-generate QR when subscription is loaded (only once)
+  useEffect(() => {
+    if (subscription?.id && !qrData && !isGenerating && !loading) {
+      generateNewQR();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [subscription?.id]);
 
   // Update subscription timer
   useEffect(() => {
@@ -374,9 +376,14 @@ export const useQRScreen = () => {
   // Cleanup intervals on unmount
   useEffect(() => {
     return () => {
-      clearIntervals();
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+      if (expiryCheckIntervalRef.current) {
+        clearInterval(expiryCheckIntervalRef.current);
+      }
     };
-  }, [clearIntervals]);
+  }, []);
 
   return {
     loading,
