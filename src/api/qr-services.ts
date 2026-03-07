@@ -72,7 +72,7 @@ export const regenerateQRCode = async (
   userId: string,
   subscriptionId: string
 ): Promise<QRGenerateResponse> => {
-  console.log();
+  console.log(subscriptionId);
   
   const response = await api.post('qr-code/regenerate-session', {
     userId,
