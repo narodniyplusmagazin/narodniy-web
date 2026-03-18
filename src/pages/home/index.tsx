@@ -17,7 +17,7 @@ import {
 import './style.scss';
 import { colors } from '../../shared/constants/theme';
 import { SecureStorageService } from '../../services/secure-storage-service';
-import { InstallPrompt } from '../../shared/components/InstallPrompt';
+
 
 interface QuickActionCard {
   id: string;
@@ -190,7 +190,24 @@ export const HomeScreen: React.FC = () => {
         </section>
 
         {/* Install App Button */}
-        <InstallPrompt />
+        {/android/i.test(navigator.userAgent) ? (
+          <div className="buttons-container">
+            <a
+              className="primary-button"
+              href="https://play.google.com/store/apps/details?id=com.narodniy.client&pcampaignid=web_share"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>Скачать приложение</span>
+            </a>
+          </div>
+        ) : /iphone|ipad|ipod/i.test(navigator.userAgent) ? (
+          <div className="buttons-container">
+            <button className="secondary-button" disabled>
+              <span>Скоро в App Store</span>
+            </button>
+          </div>
+        ) : null}
 
         {/* CTA Buttons */}
         <div className="buttons-container">
