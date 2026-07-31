@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowLeft, Clock, AlertCircle } from 'lucide-react';
 import './style.scss';
 import { forgotPassword, resetPassword } from '../../api/auth-api';
+import { OTP_SPAM_NOTICE } from '../../shared/constants/otp';
 
 type Step = 'request-otp' | 'reset-password';
 
@@ -60,7 +61,9 @@ export const ForgotPasswordScreen: React.FC = () => {
 
     try {
       await forgotPassword(emailOrPhone.toLowerCase().trim());
-      
+
+      alert(OTP_SPAM_NOTICE);
+
       // Success - move to reset password step
       setStep('reset-password');
       setTimeLeft(300); // Reset timer
@@ -145,7 +148,7 @@ export const ForgotPasswordScreen: React.FC = () => {
       await forgotPassword(emailOrPhone.toLowerCase().trim());
       setTimeLeft(300);
       setCanResend(false);
-      alert('Новый код отправлен!');
+      alert(OTP_SPAM_NOTICE);
     } catch (error: any) {
       setHasError({
         isError: true,
